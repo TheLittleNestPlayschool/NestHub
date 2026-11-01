@@ -21,13 +21,13 @@
 <form id="loginForm">
 <label for="email">Email</label><input id="email" type="email" autocomplete="username" required placeholder="Franchisee email">
 <label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required placeholder="Password">
-<button class="primary" type="submit" disabled>Sign in</button>
+<button class="primary" id="signInButton" type="submit" disabled>Sign in</button>
 </form>
-<p class="notice">Franchisee sign-in will be enabled after the separate Xano authentication endpoint is connected.</p>
+<p class="notice" id="loginMessage" role="status">Franchisee sign-in will be enabled after the separate Xano authentication endpoint is connected.</p>
 <button id="previewOpen" class="preview-link" type="button">Preview NestHub home</button>
 </section>
 <section id="homeView" class="hidden">
-<div class="preview-bar"><span class="preview-tag">NestHub · Layout Preview</span><button id="previewClose" class="secondary" type="button">← Back to sign in</button></div>
+<div class="preview-bar"><span class="preview-tag" id="homeStatus">NestHub · Layout Preview</span><button id="previewClose" class="secondary" type="button">← Back to sign in</button></div>
 <h1 class="home-title">What would you like to do?</h1>
 <p class="home-intro">Your franchise at a glance.</p>
 <div class="grid">
@@ -35,15 +35,35 @@
 <button class="tile" type="button" disabled><span class="emoji">📋</span><strong>Class Rosters &amp; Updates</strong><small>Submit weekly class lists and schedule changes.</small></button>
 <button class="tile" type="button" disabled><span class="emoji">🏡</span><strong>Franchise Information</strong><small>Essential information about your location.</small></button>
 </div>
-<div class="panel"><h2>Welcome to NestHub</h2><p class="muted">This is the foundation of your franchisee workspace. We'll connect each feature to your franchise's Xano data as we build it.</p></div>
+<div class="panel"><h2 id="homeGreeting">Welcome to NestHub</h2><p class="muted">This is the foundation of your franchisee workspace. We'll connect each feature to your franchise's Xano data as we build it.</p></div>
 </section>
 </main></div>
-<script>
-/*   Layout-only preview until franchise_user login endpoints exist*/
+<script type="module">
+import{LOGIN_ENDPOINT,signInNestHub,readNestHubSession,clearNestHubSession}from'./nh_auth.js';
+/*   NestHub login and home shell*/
 const loginView=document.getElementById('loginView'),homeView=document.getElementById('homeView');
-document.getElementById('previewOpen').addEventListener('click',()=>{loginView.classList.add('hidden');homeView.classList.remove('hidden')});
-document.getElementById('previewClose').addEventListener('click',()=>{homeView.classList.add('hidden');loginView.classList.remove('hidden')});
-document.getElementById('loginForm').addEventListener('submit',event=>event.preventDefault());
+const form=document.getElementById('loginForm'),button=document.getElementById('signInButton'),message=document.getElementById('loginMessage');
+const openPreview=document.getElementById('previewOpen'),back=document.getElementById('previewClose');
+function showHome(session=null){
+loginView.classList.add('hidden');homeView.classList.remove('hidden');
+document.getElementById('homeStatus').textContent=session?'NestHub · Franchise '+session.user.franchise_id:'NestHub · Layout Preview';
+document.getElementById('homeGreeting').textContent=session?'Welcome'+(session.user.name?', '+session.user.name:''):'Welcome to NestHub';
+back.textContent=session?'Sign out':'← Back to sign in';
+}
+function showLogin(){homeView.classList.add('hidden');loginView.classList.remove('hidden')}
+const session=readNestHubSession();
+if(session)showHome(session);
+button.disabled=!LOGIN_ENDPOINT;
+if(LOGIN_ENDPOINT)message.textContent='';
+form.addEventListener('submit',async event=>{
+event.preventDefault();if(!LOGIN_ENDPOINT)return;
+button.disabled=true;button.textContent='Signing in…';message.textContent='';
+try{const signedIn=await signInNestHub(document.getElementById('email').value.trim(),document.getElementById('password').value);form.reset();showHome(signedIn)}
+catch(error){message.textContent=error instanceof Error?error.message:'Unable to sign in.'}
+finally{button.disabled=false;button.textContent='Sign in'}
+});
+openPreview.addEventListener('click',()=>showHome());
+back.addEventListener('click',()=>{clearNestHubSession();showLogin()});
 </script>
 </body>
 </html>
