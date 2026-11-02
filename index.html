@@ -11,6 +11,7 @@
 <style>
 /*   NestHub mobile-first franchise workspace*/
 #homeView{max-width:680px;margin:0 auto}.main:has(#homeView:not(.hidden)){padding:20px 14px 36px}.topbar{min-height:64px}.hub-actions,.hub-choices{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px}.hub-tab,.hub-choice{min-height:47px;padding:10px 7px;border-radius:13px;border:1px solid rgba(255,255,255,.88);background:rgba(255,255,255,.56);color:#304356;font-size:.82rem;font-weight:800;line-height:1.25}.hub-tab.selected,.hub-choice.chosen{background:rgba(255,255,255,.9);border-color:#afc9b4;box-shadow:0 5px 18px rgba(50,78,62,.12)}.hub-card{background:rgba(255,255,255,.76);border:1px solid rgba(255,255,255,.92);border-radius:20px;padding:17px;box-shadow:0 12px 30px rgba(49,55,66,.09)}.hub-card h2{font-size:1.15rem;margin:0 0 7px}.hub-card .muted{font-size:.85rem;margin:0 0 14px}.hub-card label{font-size:.85rem;margin:9px 0 8px}#hubText{width:100%;height:160px;min-height:110px;max-height:260px;overflow-y:auto;resize:vertical;border:1px solid #cbd5d1;border-radius:12px;background:#fff;font:inherit;font-size:.9rem;padding:13px;line-height:1.5;outline:none}#hubText:focus{border-color:#769a80;box-shadow:0 0 0 3px rgba(111,155,122,.15)}.hub-card .primary{margin-top:12px}.hub-wide{width:100%;border-radius:12px}.hub-card pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;margin:0 0 12px;padding:13px;border-radius:12px;border:1px solid #dce5db;background:#f7faf6;font:inherit;font-size:.88rem;line-height:1.5}.hub-hint{color:#647586;font-size:.75rem;line-height:1.5;text-align:center;margin:10px 0 0}.calendar-empty{display:flex;flex-direction:column;align-items:center;gap:7px;padding:32px 12px;border:1px dashed #c9d4cf;border-radius:14px;background:rgba(255,255,255,.44);text-align:center}.calendar-empty span{font-size:2rem}.calendar-empty p{margin:0;color:#637282;font-size:.82rem}.hub-footer{text-align:center;margin:52px auto 8px}.hub-footer button{border:0;background:rgba(255,255,255,.5);border-radius:12px;color:#496277;padding:11px 22px;font-size:.78rem;font-weight:700}@media(max-width:600px){.main:has(#homeView:not(.hidden)){padding:18px 12px 32px}.hub-card{padding:15px}.hub-tab,.hub-choice{font-size:.76rem;min-height:43px}}
+.dashboard-title{font-size:1.35rem;margin:0 0 16px;color:#263449}.dashboard-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.dashboard-tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-height:132px;padding:17px;border:1px solid rgba(255,255,255,.85);border-radius:18px;background:rgba(255,255,255,.68);box-shadow:0 8px 22px rgba(44,52,65,.07);text-align:left;color:#263449;font:inherit}.dashboard-tile:hover{background:rgba(255,255,255,.88)}.dashboard-icon{font-size:1.7rem;line-height:1.2;margin-bottom:5px}.dashboard-tile strong{font-size:.95rem}.dashboard-tile small{font-size:.76rem;line-height:1.35;color:#64748b}#moduleBackBar{margin:0 0 15px}#moduleBack{font-size:.83rem}@media(max-width:420px){.dashboard-grid{gap:10px}.dashboard-tile{min-height:124px;padding:13px}.dashboard-tile strong{font-size:.88rem}.dashboard-tile small{font-size:.72rem}}
 </style>
 </head>
 <body>
@@ -30,8 +31,19 @@
 <p class="notice" id="loginMessage" role="status">Franchisee sign-in will be enabled after the separate Xano authentication endpoint is connected.</p>
 </section>
 <section id="homeView" class="hidden">
-<div class="hub-actions"><button type="button" class="hub-tab selected" data-page="roster">📋 Rosters &amp; Updates</button><button type="button" class="hub-tab" data-page="calendar">🗓️ Calendar</button></div>
-<section id="rosterPage" class="hub-section">
+<section id="dashboardPage" class="hub-section">
+<h1 class="dashboard-title">NestHub Dashboard</h1>
+<div class="dashboard-grid">
+<button type="button" class="dashboard-tile" data-open="calendar"><span class="dashboard-icon">🗓️</span><strong>Calendar</strong><small>Classes &amp; schedule</small></button>
+<button type="button" class="dashboard-tile" data-open="roster"><span class="dashboard-icon">📋</span><strong>Rosters &amp; Updates</strong><small>Submit changes</small></button>
+<button type="button" class="dashboard-tile" data-open="enrollment"><span class="dashboard-icon">👨‍👩‍👧</span><strong>Enrollment</strong><small>Students &amp; families</small></button>
+<button type="button" class="dashboard-tile" data-open="performance"><span class="dashboard-icon">📊</span><strong>Performance</strong><small>Location overview</small></button>
+<button type="button" class="dashboard-tile" data-open="financials"><span class="dashboard-icon">💼</span><strong>Financials</strong><small>Revenue &amp; royalties</small></button>
+<button type="button" class="dashboard-tile" data-open="office"><span class="dashboard-icon">💬</span><strong>Head Office</strong><small>Messages &amp; support</small></button>
+</div>
+</section>
+<div id="moduleBackBar" class="hidden"><button type="button" id="moduleBack" class="secondary">← Dashboard</button></div>
+<section id="rosterPage" class="hub-section hidden">
 <div class="hub-choices"><button type="button" class="hub-choice chosen" data-kind="roster">📋 Weekly Roster</button><button type="button" class="hub-choice" data-kind="update">🗓️ Calendar Update</button></div>
 <div id="hubEditor" class="hub-card">
 <h2 id="hubTitle">Submit Weekly Roster</h2><p id="hubHelp" class="muted">Copy your Facebook class roster and paste it below. A full week or partial roster is fine.</p>
@@ -42,6 +54,7 @@
 <div id="hubReviewView" class="hub-card hidden"><h2>Review Your Submission</h2><p id="hubKindLabel" class="muted">Weekly Roster</p><pre id="hubPreview"></pre><button type="button" id="hubEdit" class="secondary hub-wide">← Back to Edit</button><button type="button" id="hubSubmit" class="primary" disabled>Submit and Save</button><p class="hub-hint">Submitting will be enabled when the NestHub submission endpoint is connected.</p></div>
 </section>
 <section id="calendarPage" class="hub-section hidden"><div class="hub-card"><h2>Franchise Calendar</h2><p class="muted">Your class schedule and availability will appear here.</p><div class="calendar-empty"><span>🗓️</span><strong>Calendar view</strong><p>Read-only. Waiting for the NestHub calendar endpoint.</p></div></div></section>
+<section id="placeholderPage" class="hub-section hidden"><div class="hub-card"><h2 id="placeholderTitle">Coming Soon</h2><p class="muted">This section will be added as NestHub develops.</p></div></section>
 <div class="hub-footer"><button id="signOut" type="button">Sign Out</button></div>
 </section>
 </main></div>
@@ -51,11 +64,18 @@ import{LOGIN_ENDPOINT,signInNestHub,readNestHubSession,clearNestHubSession}from'
 const $=id=>document.getElementById(id);
 const loginView=$('loginView'),homeView=$('homeView'),form=$('loginForm'),button=$('signInButton'),message=$('loginMessage');
 const drafts={roster:'',update:''};let kind='roster';
-function showHome(){loginView.classList.add('hidden');homeView.classList.remove('hidden');showPage('roster')}
+function showHome(){loginView.classList.add('hidden');homeView.classList.remove('hidden');showPage('dashboard')}
 function showLogin(){homeView.classList.add('hidden');loginView.classList.remove('hidden')}
 function showPage(page){
-document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('selected',b.dataset.page===page));
-$('rosterPage').classList.toggle('hidden',page!=='roster');$('calendarPage').classList.toggle('hidden',page!=='calendar');
+const primary=['dashboard','roster','calendar'];
+$('dashboardPage').classList.toggle('hidden',page!=='dashboard');
+$('rosterPage').classList.toggle('hidden',page!=='roster');
+$('calendarPage').classList.toggle('hidden',page!=='calendar');
+$('placeholderPage').classList.toggle('hidden',primary.includes(page));
+$('moduleBackBar').classList.toggle('hidden',page==='dashboard');
+const titles={enrollment:'Enrollment',performance:'Performance',financials:'Financials',office:'Head Office'};
+if(titles[page])$('placeholderTitle').textContent=titles[page];
+window.scrollTo({top:0,behavior:'smooth'});
 }
 function showKind(next){
 drafts[kind]=$('hubText').value;kind=next;
@@ -67,7 +87,8 @@ $('hubLabel').textContent=roster?'Paste class roster':'What has changed?';
 $('hubText').placeholder=roster?'Paste the class roster from Facebook here…':'Example: Wednesday afternoon class now has 2 enrolled children.';
 $('hubText').value=drafts[kind];$('hubReview').disabled=!$('hubText').value.trim();
 }
-document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.open)));
+$('moduleBack').addEventListener('click',()=>showPage('dashboard'));
 document.querySelectorAll('[data-kind]').forEach(b=>b.addEventListener('click',()=>showKind(b.dataset.kind)));
 $('hubText').addEventListener('input',()=>{drafts[kind]=$('hubText').value;$('hubReview').disabled=!drafts[kind].trim()});
 $('hubReview').addEventListener('click',()=>{if(!$('hubText').value.trim())return;drafts[kind]=$('hubText').value;$('hubEditor').classList.add('hidden');$('hubReviewView').classList.remove('hidden');$('hubPreview').textContent=drafts[kind].trim();$('hubKindLabel').textContent=kind==='roster'?'Weekly Roster':'Calendar Update'});
