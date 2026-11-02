@@ -27,6 +27,7 @@
 .monitor-ops button span{font-size:1rem;line-height:1}.monitor-ops button strong{font-size:.72rem}.monitor-ops button small{font-size:.62rem;color:#647687;line-height:1.2;flex-basis:100%}.monitor-ops button:active{background:rgba(255,255,255,.95)}
 @media(min-width:700px){.monitor{padding:17px}.monitor-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.monitor-ops{grid-template-columns:repeat(4,minmax(0,1fr))}.monitor-metric{min-height:53px}}
 </style>
+<style>.hub-popup{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(26,38,47,.33);backdrop-filter:blur(5px)}.hub-popup-card{width:min(340px,100%);height:245px;padding:24px;background:#fff;border-radius:22px;box-shadow:0 20px 65px rgba(25,39,48,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#263449}.hub-popup-icon{font-size:34px;margin-bottom:9px}.hub-popup-card h2{margin:0 0 9px;font-size:1.3rem}.hub-popup-card p{margin:0;font-size:.9rem;line-height:1.45;color:#637282}.hub-popup-card button{margin-top:auto;width:100%}</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
@@ -58,19 +59,21 @@
 <textarea id="hubText" placeholder="Paste the class roster from Facebook here…" spellcheck="false"></textarea>
 <button type="button" id="hubReview" class="primary" disabled>Review Submission →</button>
 </div>
-<div id="hubReviewView" class="hub-card hidden"><h2>Review Your Submission</h2><p id="hubKindLabel" class="muted">Weekly Roster</p><pre id="hubPreview"></pre><button type="button" id="hubEdit" class="secondary hub-wide">← Back to Edit</button><button type="button" id="hubSubmit" class="primary" disabled>Submit and Save</button><p class="hub-hint">Submitting will be enabled when the NestHub submission endpoint is connected.</p></div>
+<div id="hubReviewView" class="hub-card hidden"><h2>Review Your Submission</h2><p id="hubKindLabel" class="muted">Weekly Roster</p><pre id="hubPreview"></pre><button type="button" id="hubEdit" class="secondary hub-wide">← Back to Edit</button><button type="button" id="hubSubmit" class="primary">Submit and Save</button></div>
 </section>
 <section id="calendarPage" class="hub-section hidden"><div class="hub-card"><h2>Franchise Calendar</h2><p class="muted">Your class schedule and availability will appear here.</p><div class="calendar-empty"><span>🗓️</span><strong>Calendar view</strong><p>Read-only. Waiting for the NestHub calendar endpoint.</p></div></div></section>
 <section id="placeholderPage" class="hub-section hidden"><div class="hub-card"><h2 id="placeholderTitle">Coming Soon</h2><p class="muted">This section will be added as NestHub develops.</p></div></section>
 <div class="hub-footer"><button id="signOut" type="button">Sign Out</button></div>
 </section>
 </main></div>
+<div id="hubSubmissionPopup" class="hub-popup hidden" role="dialog" aria-modal="true" aria-labelledby="hubPopupTitle"><div class="hub-popup-card"><div id="hubPopupIcon" class="hub-popup-icon">⏳</div><h2 id="hubPopupTitle">Submitting…</h2><p id="hubPopupText">Saving your submission.</p><button type="button" id="hubPopupOk" class="primary" hidden>OK</button></div></div>
 <script type="module">
 import{LOGIN_ENDPOINT,signInNestHub,readNestHubSession,clearNestHubSession}from'./nh_auth.js';
 /*   NestHub login and mobile franchise workspace*/
 const $=id=>document.getElementById(id);
 const loginView=$('loginView'),homeView=$('homeView'),form=$('loginForm'),button=$('signInButton'),message=$('loginMessage');
-const drafts={roster:'',update:''};let kind='roster';
+const drafts={roster:'',update:''};let kind='roster',submitting=false;
+const ROSTER_ENDPOINT='https://x58r-xped-p4y6.n7e.xano.io/api:nKhpVe8d/nh_roster_submit';
 function showHome(){loginView.classList.add('hidden');homeView.classList.remove('hidden');showPage('dashboard')}
 function showLogin(){homeView.classList.add('hidden');loginView.classList.remove('hidden')}
 function showPage(page){
@@ -99,6 +102,13 @@ $('moduleBack').addEventListener('click',()=>showPage('dashboard'));
 document.querySelectorAll('[data-kind]').forEach(b=>b.addEventListener('click',()=>showKind(b.dataset.kind)));
 $('hubText').addEventListener('input',()=>{drafts[kind]=$('hubText').value;$('hubReview').disabled=!drafts[kind].trim()});
 $('hubReview').addEventListener('click',()=>{if(!$('hubText').value.trim())return;drafts[kind]=$('hubText').value;$('hubEditor').classList.add('hidden');$('hubReviewView').classList.remove('hidden');$('hubPreview').textContent=drafts[kind].trim();$('hubKindLabel').textContent=kind==='roster'?'Weekly Roster':'Calendar Update'});
+function showSubmitPopup(title,text,icon,showOk){$('hubSubmissionPopup').classList.remove('hidden');$('hubPopupTitle').textContent=title;$('hubPopupText').textContent=text;$('hubPopupIcon').textContent=icon;$('hubPopupOk').hidden=!showOk}
+$('hubPopupOk').addEventListener('click',()=>{const saved=$('hubPopupTitle').textContent==='Done';$('hubSubmissionPopup').classList.add('hidden');if(saved){$('hubReviewView').classList.add('hidden');$('hubEditor').classList.remove('hidden');$('hubText').value='';$('hubReview').disabled=true;showPage('dashboard')}});
+$('hubSubmit').addEventListener('click',async()=>{
+if(submitting)return;const text=drafts[kind].trim(),session=readNestHubSession();if(!text||!session?.token)return;
+submitting=true;$('hubSubmit').disabled=true;showSubmitPopup('Submitting…','Saving your submission.','⏳',false);
+try{const res=await fetch(ROSTER_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json',Authorization:'Bearer '+session.token},body:JSON.stringify({roster_text:text})});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||data.error||'Unable to save submission.');if(!data?.weekly_roster?.id)throw new Error('Xano did not confirm a saved record. Check before resubmitting.');drafts[kind]='';showSubmitPopup('Done','Your submission has been saved.','✓',true)}catch(error){showSubmitPopup('Unable to submit',error instanceof Error?error.message:'Unable to save submission.','!',true)}finally{submitting=false;$('hubSubmit').disabled=false}
+});
 $('hubEdit').addEventListener('click',()=>{$('hubReviewView').classList.add('hidden');$('hubEditor').classList.remove('hidden')});
 $('signOut').addEventListener('click',()=>{clearNestHubSession();showLogin();$('hubReviewView').classList.add('hidden');$('hubEditor').classList.remove('hidden')});
 if(readNestHubSession())showHome();
