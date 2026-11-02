@@ -45,7 +45,7 @@ const form=document.getElementById('loginForm'),button=document.getElementById('
 const back=document.getElementById('previewClose');
 function showHome(session){
 loginView.classList.add('hidden');homeView.classList.remove('hidden');
-document.getElementById('homeStatus').textContent='NestHub · Franchise '+session.user.franchise_id;
+document.getElementById('homeStatus').textContent='NestHub';
 document.getElementById('homeGreeting').textContent='Welcome'+(session.user.name?', '+session.user.name:'');
 back.textContent='Sign out';
 }
