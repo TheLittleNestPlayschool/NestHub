@@ -13,8 +13,8 @@ const data=await response.json().catch(()=>({}));
 if(!response.ok)throw new Error(data.message||data.error||'Incorrect email or password.');
 const token=data.authToken||data.auth_token||data.token;
 const user=data.user||data.franchise_user||data.ad_user||null;
-if(!token||!user||!user.id)throw new Error('Login response is missing the user identity or token.');
-const session={token,user:{id:user.id,name:user.name||user.full_name||'',email:user.email||email}};
+if(!token)throw new Error('Login response is missing the authentication token.');
+const session={token,user:{id:user?.id||null,name:user?.name||user?.full_name||'',email:user?.email||email}};
 sessionStorage.setItem(SESSION_KEY,JSON.stringify(session));
 return session;
 }
