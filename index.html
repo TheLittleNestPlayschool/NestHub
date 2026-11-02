@@ -57,9 +57,8 @@
 <h2 id="hubTitle">Submit Weekly Roster</h2><p id="hubHelp" class="muted">Copy your Facebook class roster and paste it below. A full week or partial roster is fine.</p>
 <label for="hubText" id="hubLabel">Paste class roster</label>
 <textarea id="hubText" placeholder="Paste the class roster from Facebook here…" spellcheck="false"></textarea>
-<button type="button" id="hubReview" class="primary" disabled>Review Submission →</button>
+<button type="button" id="hubSubmit" class="primary" disabled>Submit and Save</button>
 </div>
-<div id="hubReviewView" class="hub-card hidden"><h2>Review Your Submission</h2><p id="hubKindLabel" class="muted">Weekly Roster</p><pre id="hubPreview"></pre><button type="button" id="hubEdit" class="secondary hub-wide">← Back to Edit</button><button type="button" id="hubSubmit" class="primary">Submit and Save</button></div>
 </section>
 <section id="calendarPage" class="hub-section hidden"><div class="hub-card"><h2>Franchise Calendar</h2><p class="muted">Your class schedule and availability will appear here.</p><div class="calendar-empty"><span>🗓️</span><strong>Calendar view</strong><p>Read-only. Waiting for the NestHub calendar endpoint.</p></div></div></section>
 <section id="placeholderPage" class="hub-section hidden"><div class="hub-card"><h2 id="placeholderTitle">Coming Soon</h2><p class="muted">This section will be added as NestHub develops.</p></div></section>
@@ -88,6 +87,7 @@ if(titles[page])$('placeholderTitle').textContent=titles[page];
 window.scrollTo({top:0,behavior:'smooth'});
 }
 function showKind(next){
+if(submitting)return;
 drafts[kind]=$('hubText').value;kind=next;
 document.querySelectorAll('[data-kind]').forEach(b=>b.classList.toggle('chosen',b.dataset.kind===kind));
 const roster=kind==='roster';
@@ -95,22 +95,23 @@ $('hubTitle').textContent=roster?'Submit Weekly Roster':'Report Calendar Update'
 $('hubHelp').textContent=roster?'Copy your Facebook class roster and paste it below. A full week or partial roster is fine.':'Tell head office what changed. Include the day and session time when relevant.';
 $('hubLabel').textContent=roster?'Paste class roster':'What has changed?';
 $('hubText').placeholder=roster?'Paste the class roster from Facebook here…':'Example: Wednesday afternoon class now has 2 enrolled children.';
-$('hubText').value=drafts[kind];$('hubReview').disabled=!$('hubText').value.trim();
+$('hubText').value=drafts[kind];$('hubSubmit').disabled=!$('hubText').value.trim();
 }
 document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.open)));
 $('moduleBack').addEventListener('click',()=>showPage('dashboard'));
 document.querySelectorAll('[data-kind]').forEach(b=>b.addEventListener('click',()=>showKind(b.dataset.kind)));
-$('hubText').addEventListener('input',()=>{drafts[kind]=$('hubText').value;$('hubReview').disabled=!drafts[kind].trim()});
-$('hubReview').addEventListener('click',()=>{if(!$('hubText').value.trim())return;drafts[kind]=$('hubText').value;$('hubEditor').classList.add('hidden');$('hubReviewView').classList.remove('hidden');$('hubPreview').textContent=drafts[kind].trim();$('hubKindLabel').textContent=kind==='roster'?'Weekly Roster':'Calendar Update'});
+$('hubText').addEventListener('input',()=>{drafts[kind]=$('hubText').value;$('hubSubmit').disabled=!drafts[kind].trim()});
 function showSubmitPopup(title,text,icon,showOk){$('hubSubmissionPopup').classList.remove('hidden');$('hubPopupTitle').textContent=title;$('hubPopupText').textContent=text;$('hubPopupIcon').textContent=icon;$('hubPopupOk').hidden=!showOk}
-$('hubPopupOk').addEventListener('click',()=>{const saved=$('hubPopupTitle').textContent==='Done';$('hubSubmissionPopup').classList.add('hidden');if(saved){$('hubReviewView').classList.add('hidden');$('hubEditor').classList.remove('hidden');$('hubText').value='';$('hubReview').disabled=true;showPage('dashboard')}});
+$('hubPopupOk').addEventListener('click',()=>{const saved=$('hubPopupTitle').textContent==='Record Saved';$('hubSubmissionPopup').classList.add('hidden');if(saved){$('hubText').value='';$('hubSubmit').disabled=true;showPage('dashboard')}});
 $('hubSubmit').addEventListener('click',async()=>{
-if(submitting)return;const text=drafts[kind].trim(),session=readNestHubSession();if(!text||!session?.token)return;
-submitting=true;$('hubSubmit').disabled=true;showSubmitPopup('Submitting…','Saving your submission.','⏳',false);
-try{const res=await fetch(ROSTER_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json',Authorization:'Bearer '+session.token},body:JSON.stringify({roster_text:text})});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||data.error||'Unable to save submission.');if(!data?.weekly_roster?.id)throw new Error('Xano did not confirm a saved record. Check before resubmitting.');drafts[kind]='';showSubmitPopup('Done','Your submission has been saved.','✓',true)}catch(error){showSubmitPopup('Unable to submit',error instanceof Error?error.message:'Unable to save submission.','!',true)}finally{submitting=false;$('hubSubmit').disabled=false}
+if(submitting)return;
+const text=$('hubText').value.trim(),session=readNestHubSession();if(!text||!session?.token)return;
+drafts[kind]=text;submitting=true;$('hubSubmit').disabled=true;showSubmitPopup('Submitting…','Saving your submission.','⏳',false);
+try{const res=await fetch(ROSTER_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json',Authorization:'Bearer '+session.token},body:JSON.stringify({roster_text:text})});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||data.error||'Unable to save submission.');if(!data?.weekly_roster?.id)throw new Error('Xano did not confirm a saved record. Check before resubmitting.');drafts[kind]='';showSubmitPopup('Record Saved','Your submission has been saved.','✓',true)}
+catch(error){showSubmitPopup('Unable to submit',error instanceof Error?error.message:'Unable to save submission.','!',true)}
+finally{submitting=false;$('hubSubmit').disabled=!$('hubText').value.trim()}
 });
-$('hubEdit').addEventListener('click',()=>{$('hubReviewView').classList.add('hidden');$('hubEditor').classList.remove('hidden')});
-$('signOut').addEventListener('click',()=>{clearNestHubSession();showLogin();$('hubReviewView').classList.add('hidden');$('hubEditor').classList.remove('hidden')});
+$('signOut').addEventListener('click',()=>{clearNestHubSession();showLogin()});
 if(readNestHubSession())showHome();
 button.disabled=!LOGIN_ENDPOINT;
 if(LOGIN_ENDPOINT)message.textContent='';
