@@ -31,8 +31,12 @@
 <style>/*   NestHub header context*/
 .topbar{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}.welcome{min-width:0;text-align:center;overflow-wrap:anywhere;line-height:1.25}.quote{display:block;min-width:0;max-width:100%;font-size:.68rem;font-weight:800;line-height:1.2;overflow-wrap:anywhere}.quote .hub-quote-text{display:block}.quote .hub-quote-emojis{display:block;font-size:.74rem;margin-top:3px}@media(max-width:690px){.topbar{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:5px;padding:8px}.welcome{font-size:.68rem}.quote{display:block;font-size:.58rem}.logo{width:100px}}@media(max-width:390px){.welcome{font-size:.6rem}.quote{font-size:.51rem}.logo{width:86px}}</style>
 <style>
-/*   NestHub read-only mobile calendar*/
-.nh-calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.nh-calendar-head .secondary{font-size:.75rem;padding:8px 12px;white-space:nowrap}.nh-calendar-status{font-size:.75rem;color:#5c7282;margin:10px 0}.nh-week-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:12px 0}.nh-week-tabs button,.nh-date-grid button{font:inherit;border:1px solid #d0ddd3;border-radius:10px;background:rgba(255,255,255,.65);color:#263449;padding:9px 5px}.nh-week-tabs button{font-size:.72rem;font-weight:700}.nh-week-tabs button.active,.nh-date-grid button.active{background:#607f67;color:#fff;border-color:#607f67}.nh-date-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.nh-date-grid button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 2px;font-size:.79rem;font-weight:800}.nh-date-grid small{font-size:.59rem;font-weight:500}.nh-day-detail{margin-top:13px}.nh-day-detail h3{font-size:.91rem;margin:0 0 10px}.nh-session{background:rgba(255,255,255,.72);border:1px solid #d8e3db;border-radius:12px;padding:12px;margin-bottom:8px}.nh-session-top{display:flex;align-items:flex-start;justify-content:space-between;gap:7px;font-size:.82rem}.nh-session-top strong{line-height:1.35}.nh-session-time{color:#5c7080;font-size:.75rem;white-space:nowrap}.nh-session-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:10px}.nh-session-counts span{border-radius:8px;background:#f2f7f1;padding:7px 3px;text-align:center;font-size:.87rem;font-weight:800}.nh-session-counts small{display:block;font-size:.58rem;color:#607385;font-weight:500;margin-bottom:3px}.nh-session-closed{color:#aa4842;font-weight:800;font-size:.76rem;margin-top:7px}.nh-no-data{padding:15px 10px;text-align:center;border:1px dashed #cad9cd;border-radius:12px;color:#5f7383;font-size:.81rem;line-height:1.5}@media(max-width:390px){.nh-session-counts{gap:3px}.nh-session-counts span{padding:6px 1px}.nh-calendar-head h2{font-size:1.05rem}}
+/*   NestHub three-week read-only session availability calendar*/
+.nh-cal-card{padding:10px 10px 12px}.nh-cal-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:9px}.nh-cal-title{font-size:1.02rem;font-weight:850;color:#2c3133}.nh-cal-tools{display:flex;align-items:center;gap:5px;flex-wrap:wrap}.nh-cal-key{font-size:.65rem;color:#596368;margin-right:7px;white-space:nowrap}.nh-cal-key b{color:#313a37}.nh-cal-tools button{border:1px solid #d8d2c8;background:#fffdfb;color:#38433c;border-radius:8px;padding:6px 10px;font-size:.74rem;min-height:30px}.nh-cal-tools button:hover{background:#eff3eb}.nh-calendar-status{font-size:.7rem;color:#68746b;margin:0 0 8px;line-height:1.3}.nh-calendar-status:empty{display:none}
+.nh-scroll-hint{font-size:.68rem;color:#5c6f6d;margin:0 0 6px;text-align:right}.nh-cal-scroll{max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;touch-action:pan-x pan-y;border:1px solid #e0d8ce;border-radius:12px;background:#fffdf9;scrollbar-width:thin;scrollbar-color:#a1b8a5 #f2f2ef}.nh-cal-inner{min-width:855px}.nh-cal-weekdays,.nh-cal-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}.nh-cal-weekdays{background:#f3f1eb}.nh-cal-weekdays span{padding:6px 3px;text-align:center;font-size:.69rem;font-weight:800;color:#6c6c66;border-right:1px solid #e0d8ce}.nh-cal-weekdays span:last-child{border-right:0}.nh-cal-day{height:128px;border-top:1px solid #e0d8ce;border-right:1px solid #e0d8ce;padding:5px 6px;background:#fffdf9;min-width:0}.nh-cal-day:last-child{border-right:0}.nh-cal-day.today{box-shadow:inset 0 0 0 2px #66846e;background:#f4f8f0}.nh-cal-day.closed{background:#f5f2ee}.nh-cal-day-num{display:inline-flex;align-items:center;justify-content:center;height:21px;min-width:21px;font-size:.76rem;font-weight:800;color:#343c39}.nh-cal-day.today .nh-cal-day-num{border-radius:50%;background:#617f69;color:white}.nh-cal-day-num small{font-size:.56rem;font-weight:700}.nh-cal-closed{font-size:.67rem;color:#8a7770;margin:5px 0}.nh-cal-headings,.nh-cal-line{display:grid;grid-template-columns:minmax(34px,1.5fr) repeat(4,minmax(0,1fr));gap:2px;align-items:center;white-space:nowrap}.nh-cal-headings{border-bottom:1px solid #e7e3dd;color:#707a72;padding:2px 0 3px;font-size:.57rem;font-weight:800}.nh-cal-headings span:not(:first-child),.nh-cal-line span:not(:first-child){text-align:right}.nh-cal-line{padding:3px 0 0;font-size:.66rem;font-variant-numeric:tabular-nums;color:#575f5a}.nh-cal-line .nh-number{font-weight:750}.nh-cal-line .nh-open.ok{color:#2e7a46}.nh-cal-line .nh-open.full{color:#b4473d}.nh-cal-line .nh-open.unknown{color:#a27a3a}.nh-cal-legend{display:flex;align-items:center;gap:13px;flex-wrap:wrap;padding:8px 4px 2px;font-size:.66rem;color:#5a6b64}.nh-cal-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;background:#67836e}.nh-cal-dot.closed{background:#bc6359}.nh-cal-dot.unset{background:#c29a69}
+@media(min-width:900px){#homeView:has(#calendarPage:not(.hidden)){max-width:1220px}.main:has(#calendarPage:not(.hidden)){padding:14px 10px 30px}.nh-cal-inner{min-width:0}.nh-cal-day{height:126px}.nh-cal-toolbar{margin-bottom:6px}}
+@media(max-width:899px){.nh-cal-inner{width:855px}.nh-scroll-hint{display:block}}
+@media(max-width:430px){.nh-cal-key{font-size:.6rem}.nh-cal-title{font-size:.95rem}.nh-cal-card{padding:9px}.nh-cal-tools button{padding:5px 8px}}
 </style>
 <style>
 /*   Calendar-only franchise home and two-line teacher quote*/
@@ -92,7 +96,13 @@
 <button type="button" id="hubSubmit" class="primary" disabled>Submit and Save</button>
 </div>
 </section>
-<section id="calendarPage" class="hub-section hidden"><div class="hub-card"><div class="nh-calendar-head"><h2>Franchise Calendar</h2><button id="nhCalendarRefresh" type="button" class="secondary">↻ Refresh</button></div><p class="muted">Your class schedule and recorded availability · View only</p><p id="nhCalendarStatus" class="nh-calendar-status" role="status">Loading calendar…</p><div id="nhCalendarWeeks" class="nh-week-tabs hidden"></div><div id="nhCalendarDates" class="nh-date-grid"></div><div id="nhCalendarDetail" class="nh-day-detail"></div></div></section>
+<section id="calendarPage" class="hub-section hidden"><div class="hub-card nh-cal-card">
+<div class="nh-cal-toolbar"><div class="nh-cal-title" id="nhCalendarRange">Session Calendar</div><div class="nh-cal-tools"><span class="nh-cal-key"><b>E</b> Enrolled&nbsp; <b>M</b> Makeup&nbsp; <b>T</b> Free Trial&nbsp; <b>O</b> Open</span><button id="nhCalendarPrev" type="button" aria-label="Previous three weeks">‹</button><button id="nhCalendarToday" type="button">Today</button><button id="nhCalendarNext" type="button" aria-label="Next three weeks">›</button><button id="nhCalendarRefresh" type="button" aria-label="Refresh calendar">↻</button></div></div>
+<p id="nhCalendarStatus" class="nh-calendar-status" role="status">Loading calendar…</p>
+<div class="nh-scroll-hint">Swipe horizontally to see more days ↔</div>
+<div class="nh-cal-scroll" id="nhCalendarScroll" tabindex="0" aria-label="Scrollable three-week session calendar"><div class="nh-cal-inner"><div class="nh-cal-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div><div id="nhCalendarGrid"></div></div></div>
+<div class="nh-cal-legend"><span><i class="nh-cal-dot"></i>Today</span><span><i class="nh-cal-dot unset"></i>Not yet updated</span><span><i class="nh-cal-dot closed"></i>Closed</span></div>
+</div></section>
 <section id="placeholderPage" class="hub-section hidden"><div class="hub-card"><h2 id="placeholderTitle">Coming Soon</h2><p class="muted">This section will be added as NestHub develops.</p></div></section>
 <div class="hub-footer" id="hubSignOutFooter">
 <button type="button" disabled aria-hidden="true" tabindex="-1"></button>
@@ -112,46 +122,55 @@ const drafts={roster:'',update:''};let kind='update',submitting=false;
 const ROSTER_ENDPOINT='https://x58r-xped-p4y6.n7e.xano.io/api:nKhpVe8d/nh_roster_submit';
 const CONTEXT_ENDPOINT='https://x58r-xped-p4y6.n7e.xano.io/api:nKhpVe8d/nh_get_context';
 const CALENDAR_ENDPOINT='https://x58r-xped-p4y6.n7e.xano.io/api:nKhpVe8d/nh_session_calendar';
-let calendarRequest=0,calendarData=null,calendarWeek=0,calendarDay=0;
+let calendarRequest=0,calendarData=null,calendarOffset=0;
 const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const calTodayParts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+const calTodayFields=Object.fromEntries(calTodayParts.map(p=>[p.type,p.value]));
+const calToday=new Date(Number(calTodayFields.year),Number(calTodayFields.month)-1,Number(calTodayFields.day),12);
 function calendarKey(date){return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0')}
-function calendarAnchor(){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-(d.getDay()+6)%7);return d}
+function calendarAnchor(){const d=new Date(calToday);d.setDate(d.getDate()-d.getDay()+calendarOffset*21);return d}
 function calendarDate(offset){const d=calendarAnchor();d.setDate(d.getDate()+offset);return d}
 function calendarDateKey(value){if(typeof value==='number'){const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toISOString().slice(0,10)}return String(value||'').slice(0,10)}
-function calendarSessionsOn(date){return(calendarData?.sessions||[]).filter(s=>s.is_active===true&&s.display===true&&Array.isArray(s.scheduled_days)&&s.scheduled_days.some(day=>String(day).toLowerCase()===dayNames[date.getDay()].toLowerCase())).sort((a,b)=>String(a.start_time_slot).localeCompare(String(b.start_time_slot)))}
+function calendarSessionsOn(date){const eligible=(calendarData?.sessions||[]).filter(s=>s.is_active===true&&s.display===true&&Array.isArray(s.scheduled_days)&&s.scheduled_days.some(day=>String(day).toLowerCase()===dayNames[date.getDay()].toLowerCase()));
+eligible.sort((a,b)=>(String(b.description||'').toLowerCase()==='full session')-(String(a.description||'').toLowerCase()==='full session')||(b.scheduled_days?.length||0)-(a.scheduled_days?.length||0));
+const unique=new Map();for(const s of eligible){const slot=String(s.start_time_slot)+'|'+String(s.end_time_slot);if(!unique.has(slot))unique.set(slot,s)}
+return [...unique.values()].sort((a,b)=>String(a.start_time_slot).localeCompare(String(b.start_time_slot)))}
 function renderCalendar(){
 if(!calendarData)return;
-$('nhCalendarWeeks').classList.remove('hidden');
-const tabs=$('nhCalendarWeeks');tabs.replaceChildren();
-for(let w=0;w<3;w++){const button=document.createElement('button');button.type='button';button.textContent='Week '+(w+1);button.classList.toggle('active',w===calendarWeek);button.onclick=()=>{calendarWeek=w;calendarDay=w*7;renderCalendar()};tabs.append(button)}
-const dates=$('nhCalendarDates');dates.replaceChildren();
-for(let i=0;i<7;i++){const offset=calendarWeek*7+i,d=calendarDate(offset),button=document.createElement('button');button.type='button';button.classList.toggle('active',calendarDay===offset);const day=document.createElement('small');day.textContent=dayNames[d.getDay()].slice(0,3);const number=document.createElement('strong');number.textContent=d.getDate();button.append(day,number);button.onclick=()=>{calendarDay=offset;renderCalendar()};dates.append(button)}
-const d=calendarDate(calendarDay),dateKey=calendarKey(d),detail=$('nhCalendarDetail');detail.replaceChildren();
-const title=document.createElement('h3');title.textContent=d.toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric',year:'numeric'});detail.append(title);
-const sessions=calendarSessionsOn(d);
-if(!sessions.length){const note=document.createElement('div');note.className='nh-no-data';note.textContent='No regular sessions scheduled for this day.';detail.append(note);return}
-for(const s of sessions){const record=(calendarData.calendar_records||[]).find(r=>Number(r.session_id)===Number(s.id)&&calendarDateKey(r.calendar_date)===dateKey);
-const card=document.createElement('div'),head=document.createElement('div');card.className='nh-session';head.className='nh-session-top';
-const name=document.createElement('strong');name.textContent=s.name||'Class session';
-const time=document.createElement('span');time.className='nh-session-time';time.textContent=String(s.start_time_slot||'').slice(0,5)+'–'+String(s.end_time_slot||'').slice(0,5);
-head.append(name,time);card.append(head);
-if(record?.is_closed===true){const closed=document.createElement('div');closed.className='nh-session-closed';closed.textContent='Closed';card.append(closed)}
-const valid=record?.regular_count!=null,reg=valid?Number(record.regular_count):null,makeup=record?.makeup_count!=null?Number(record.makeup_count):null,trials=record?.trial_count!=null?Number(record.trial_count):null;
-const full=valid&&reg>=0&&Number.isFinite(reg)&&makeup!==null&&trials!==null;
-const total=full?reg+makeup+trials:null,capacity=Number(s.max_students);
-const open=full&&Number.isFinite(capacity)?Math.max(0,capacity-total):null;
-const counts=document.createElement('div');counts.className='nh-session-counts';
-for(const [label,val] of [['Enrolled',reg],['Makeup',record?makeup:null],['Trials',record?trials:null],['Open',record?.is_closed===true?'Closed':open]]){const item=document.createElement('span'),small=document.createElement('small');small.textContent=label;item.append(small,document.createTextNode(val===null||val===undefined||Number.isNaN(val)?'—':String(val)));counts.append(item)}
-card.append(counts);detail.append(card)}
+const first=calendarDate(0),last=calendarDate(20);
+$('nhCalendarRange').textContent=first.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' – '+last.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const records=new Map();for(const r of calendarData.calendar_records){records.set(calendarDateKey(r.calendar_date)+'|'+r.session_id,r)}
+const grid=$('nhCalendarGrid');grid.replaceChildren();
+for(let w=0;w<3;w++){const row=document.createElement('div');row.className='nh-cal-row';
+for(let i=0;i<7;i++){const d=calendarDate(w*7+i),dateKey=calendarKey(d),ss=calendarSessionsOn(d),isToday=dateKey===calendarKey(calToday),cell=document.createElement('div');
+const allClosed=ss.length&&ss.every(s=>records.get(dateKey+'|'+s.id)?.is_closed===true);
+cell.className='nh-cal-day'+(isToday?' today':'')+(!ss.length||allClosed?' closed':'');
+const num=document.createElement('div');num.className='nh-cal-day-num';num.textContent=d.getDate()===1?d.toLocaleDateString('en-US',{month:'short',day:'numeric'}):String(d.getDate());cell.append(num);
+if(!ss.length){const closed=document.createElement('div');closed.className='nh-cal-closed';closed.textContent='Closed';cell.append(closed)}
+else{
+const headings=document.createElement('div');headings.className='nh-cal-headings';for(const value of ['Time','E','M','T','O']){const label=document.createElement('span');label.textContent=value;headings.append(label)}cell.append(headings);
+for(const s of ss){const r=records.get(dateKey+'|'+s.id),closed=r?.is_closed===true,regular=r?.regular_count==null?null:Number(r.regular_count),makeup=r?.makeup_count==null?null:Number(r.makeup_count),trial=r?.trial_count==null?null:Number(r.trial_count),capacity=Number(s.max_students);
+const known=regular!==null&&Number.isFinite(regular),total=known?regular+(makeup??0)+(trial??0):null;
+const open=closed?'×':total===null||!Number.isFinite(capacity)?'—':Math.max(0,capacity-total);
+const values=[String(s.start_time_slot||'').slice(0,5),known?regular:'—',r?(makeup??'—'):'—',r?(trial??'—'):'—',open];
+const line=document.createElement('div');line.className='nh-cal-line';line.title=(s.name||'Class')+' · '+values[0]+'–'+String(s.end_time_slot||'').slice(0,5)+' · Enrolled '+values[1]+' · Makeup '+values[2]+' · Free trial '+values[3]+' · Open '+values[4];
+values.forEach((value,idx)=>{const part=document.createElement('span');part.textContent=String(value);if(idx>0)part.className='nh-number';if(idx===4)part.className+=' nh-open '+(value==='—'?'unknown':value==='×'||value===0?'full':'ok');line.append(part)});cell.append(line)}
+}row.append(cell)}
+grid.append(row)}
 }
 async function loadCalendar(){
 const session=readNestHubSession();if(!session?.token)return;
-const request=++calendarRequest;calendarData=null;$('nhCalendarWeeks').classList.add('hidden');$('nhCalendarDates').replaceChildren();$('nhCalendarDetail').replaceChildren();$('nhCalendarStatus').textContent='Loading calendar…';
+const request=++calendarRequest;calendarData=null;$('nhCalendarGrid').replaceChildren();$('nhCalendarStatus').textContent='Loading calendar…';
 const params=new URLSearchParams({start_date:calendarKey(calendarDate(0)),end_date:calendarKey(calendarDate(20))});
-try{const res=await fetch(CALENDAR_ENDPOINT+'?'+params,{headers:{Accept:'application/json',Authorization:'Bearer '+session.token}});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||data.error||'Calendar request failed');if(!Array.isArray(data.sessions)||!Array.isArray(data.calendar_records))throw new Error('Unexpected calendar response');if(request!==calendarRequest||!readNestHubSession()?.token)return;calendarData=data;calendarWeek=0;calendarDay=(new Date().getDay()+6)%7;
-$('nhCalendarStatus').textContent=data.calendar_records.length?'Recorded availability shown below. Missing counts are marked —.':'Class schedule loaded. No availability records for these dates; counts are not yet entered.';renderCalendar()
+try{const res=await fetch(CALENDAR_ENDPOINT+'?'+params,{headers:{Accept:'application/json',Authorization:'Bearer '+session.token}});const data=await res.json().catch(()=>({}));
+if(!res.ok)throw new Error(data.message||data.error||'Calendar request failed');if(!Array.isArray(data.sessions)||!Array.isArray(data.calendar_records))throw new Error('Unexpected calendar response');if(request!==calendarRequest||!readNestHubSession()?.token)return;
+calendarData=data;$('nhCalendarStatus').textContent=data.calendar_records.length?'':'Counts not yet updated for this period. Missing values are marked —.';renderCalendar();
+const scroll=$('nhCalendarScroll');if(calendarOffset===0&&scroll.scrollWidth>scroll.clientWidth){const todayColumn=calToday.getDay(),dayWidth=scroll.scrollWidth/7;scroll.scrollLeft=Math.max(0,(todayColumn-1)*dayWidth)}else scroll.scrollLeft=0;
 }catch(error){if(request===calendarRequest)$('nhCalendarStatus').textContent='Unable to load calendar: '+(error?.message||'Unknown error')}}
 $('nhCalendarRefresh').addEventListener('click',loadCalendar);
+$('nhCalendarPrev').addEventListener('click',()=>{calendarOffset--;loadCalendar()});
+$('nhCalendarNext').addEventListener('click',()=>{calendarOffset++;loadCalendar()});
+$('nhCalendarToday').addEventListener('click',()=>{calendarOffset=0;loadCalendar()});
 let contextRequest=0;
 function resetHubHeader(){$('hubWelcome').replaceChildren();const first=document.createElement('span');first.textContent='Welcome';const second=document.createElement('span');second.textContent='NestHub';$('hubWelcome').append(first,second);$('hubSaying').replaceChildren()}
 async function loadHubHeader(){
