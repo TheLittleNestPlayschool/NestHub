@@ -28,11 +28,13 @@
 @media(min-width:700px){.monitor{padding:17px}.monitor-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.monitor-ops{grid-template-columns:repeat(4,minmax(0,1fr))}.monitor-metric{min-height:53px}}
 </style>
 <style>.hub-popup{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(26,38,47,.33);backdrop-filter:blur(5px)}.hub-popup-card{width:min(340px,100%);height:245px;padding:24px;background:#fff;border-radius:22px;box-shadow:0 20px 65px rgba(25,39,48,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#263449}.hub-popup-icon{font-size:34px;margin-bottom:9px}.hub-popup-card h2{margin:0 0 9px;font-size:1.3rem}.hub-popup-card p{margin:0;font-size:.9rem;line-height:1.45;color:#637282}.hub-popup-card button{margin-top:auto;width:100%}</style>
+<style>/*   NestHub header context*/
+.topbar{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}.welcome{min-width:0;text-align:center;overflow-wrap:anywhere;line-height:1.25}.quote{display:block;min-width:0;max-width:100%;font-size:.68rem;font-weight:800;line-height:1.2;overflow-wrap:anywhere}.quote .hub-quote-text{display:block}.quote .hub-quote-emojis{display:block;font-size:.74rem;margin-top:3px}@media(max-width:690px){.topbar{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:5px;padding:8px}.welcome{font-size:.68rem}.quote{display:block;font-size:.58rem}.logo{width:100px}}@media(max-width:390px){.welcome{font-size:.6rem}.quote{font-size:.51rem}.logo{width:86px}}</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
 <div class="shell">
-<header class="topbar"><div class="welcome">Welcome to<br>NestHub</div><img class="logo" src="https://thelittlenestplayschool.github.io/TheLittleNest/mainlogo1.png" alt="The Little Nest Playschool"><div class="quote">Sharing makes happiness bigger 🐣</div></header>
+<header class="topbar"><div class="welcome" id="hubWelcome">Welcome to<br>NestHub</div><img class="logo" src="https://thelittlenestplayschool.github.io/TheLittleNest/mainlogo1.png" alt="The Little Nest Playschool"><div class="quote" id="hubSaying" aria-live="polite"></div></header>
 <main class="main">
 <section id="loginView" class="login-card">
 <div class="eyebrow">The Little Nest Playschool</div>
@@ -73,7 +75,29 @@ const $=id=>document.getElementById(id);
 const loginView=$('loginView'),homeView=$('homeView'),form=$('loginForm'),button=$('signInButton'),message=$('loginMessage');
 const drafts={roster:'',update:''};let kind='roster',submitting=false;
 const ROSTER_ENDPOINT='https://x58r-xped-p4y6.n7e.xano.io/api:nKhpVe8d/nh_roster_submit';
-function showHome(){loginView.classList.add('hidden');homeView.classList.remove('hidden');showPage('dashboard')}
+const CONTEXT_ENDPOINT='https://x58r-xped-p4y6.n7e.xano.io/api:nKhpVe8d/nh_get_context';
+let contextRequest=0;
+function resetHubHeader(){$('hubWelcome').textContent='Welcome to NestHub';$('hubSaying').replaceChildren()}
+async function loadHubHeader(){
+const session=readNestHubSession();if(!session?.token)return;
+const request=++contextRequest;
+try{
+const res=await fetch(CONTEXT_ENDPOINT,{headers:{Accept:'application/json',Authorization:'Bearer '+session.token}});
+const data=await res.json().catch(()=>({}));
+if(!res.ok)throw new Error(data?.message||'Unable to load franchisee context.');
+if(request!==contextRequest||!readNestHubSession()?.token)return;
+const user=data?.user||{};
+const name=user.name||user.full_name||user.preferred_name||user.first_name||'';
+$('hubWelcome').textContent=name?'Welcome. '+name:'Welcome to NestHub';
+const quote=Array.isArray(data?.teacher_quotes)?data.teacher_quotes[0]:data?.teacher_quotes;
+const lines=[quote?.quote_line_1,quote?.quote_line_2].filter(Boolean);
+const emojis=Array.isArray(data?.emojis)?data.emojis.slice(0,2).map(item=>item?.emoji).filter(Boolean):[];
+const target=$('hubSaying');target.replaceChildren();
+if(lines.length){const words=document.createElement('span');words.className='hub-quote-text';words.textContent='“'+lines.join(' ')+'”';target.append(words)}
+if(lines.length&&emojis.length){const icons=document.createElement('span');icons.className='hub-quote-emojis';icons.textContent=emojis.join('  ');target.append(icons)}
+}catch(error){if(request===contextRequest)console.warn('NestHub context unavailable:',error?.message||error)}
+}
+function showHome(){loginView.classList.add('hidden');homeView.classList.remove('hidden');showPage('dashboard');resetHubHeader();loadHubHeader()}
 function showLogin(){homeView.classList.add('hidden');loginView.classList.remove('hidden')}
 function showPage(page){
 const primary=['dashboard','roster','calendar'];
@@ -111,7 +135,7 @@ try{const res=await fetch(ROSTER_ENDPOINT,{method:'POST',headers:{'Content-Type'
 catch(error){showSubmitPopup('Unable to submit',error instanceof Error?error.message:'Unable to save submission.','!',true)}
 finally{submitting=false;$('hubSubmit').disabled=!$('hubText').value.trim()}
 });
-$('signOut').addEventListener('click',()=>{clearNestHubSession();showLogin()});
+$('signOut').addEventListener('click',()=>{contextRequest++;clearNestHubSession();resetHubHeader();showLogin()});
 if(readNestHubSession())showHome();
 button.disabled=!LOGIN_ENDPOINT;
 if(LOGIN_ENDPOINT)message.textContent='';
