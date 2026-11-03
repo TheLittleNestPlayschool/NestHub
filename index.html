@@ -100,7 +100,7 @@ const title=document.createElement('h3');title.textContent=d.toLocaleDateString(
 const sessions=calendarSessionsOn(d);
 if(!sessions.length){const note=document.createElement('div');note.className='nh-no-data';note.textContent='No regular sessions scheduled for this day.';detail.append(note);return}
 for(const s of sessions){const record=(calendarData.calendar_records||[]).find(r=>Number(r.session_id)===Number(s.id)&&calendarDateKey(r.calendar_date)===dateKey);
-const card=document.createElement('div');card.className='nh-session',head=document.createElement('div');head.className='nh-session-top';
+const card=document.createElement('div'),head=document.createElement('div');card.className='nh-session';head.className='nh-session-top';
 const name=document.createElement('strong');name.textContent=s.name||'Class session';
 const time=document.createElement('span');time.className='nh-session-time';time.textContent=String(s.start_time_slot||'').slice(0,5)+'–'+String(s.end_time_slot||'').slice(0,5);
 head.append(name,time);card.append(head);
