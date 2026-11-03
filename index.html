@@ -45,6 +45,16 @@
 .quote{text-align:center}.quote .hub-quote-text{display:flex;flex-direction:column;align-items:center;gap:1px}.quote .hub-quote-line{display:block;text-align:center}.quote .hub-quote-emojis{display:block;text-align:center;font-size:.78rem;margin-top:4px}
 @media(max-width:420px){.hub-calendar-home{padding:14px}.hub-calendar-actions{gap:7px}.hub-calendar-actions button{padding:10px;min-height:94px}.hub-calendar-actions button strong{font-size:.8rem}.hub-calendar-actions button small{font-size:.68rem}.quote{font-size:.52rem}}
 </style>
+<style>
+/*   NestHub compact header and dashboard footer controls*/
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;line-height:1.2}
+.welcome span{display:block;max-width:100%;overflow-wrap:anywhere}
+.hub-calendar-home .monitor-intro h1{margin:1px 0 14px}
+.hub-footer{display:flex;justify-content:center;align-items:center;gap:9px;flex-wrap:nowrap;margin:32px auto 8px;width:100%}
+.hub-footer button{flex:1 1 0;min-width:0;max-width:170px;min-height:40px;padding:8px 5px;font-size:.74rem;line-height:1.2;white-space:normal}
+.hub-footer #signOut{margin-left:auto;background:rgba(255,255,255,.67)}
+@media(max-width:480px){.hub-footer{gap:5px}.hub-footer button{font-size:.61rem;padding:8px 3px;min-height:42px}}
+</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
@@ -65,7 +75,7 @@
 <section id="homeView" class="hidden">
 <section id="dashboardPage" class="hub-section">
 <div class="monitor hub-calendar-home">
-<div class="monitor-intro"><small>THE LITTLE NEST PLAYSCHOOL</small><h1>Calendar Updates</h1><p>Send class schedule changes to head office or view your calendar.</p></div>
+<div class="monitor-intro"><h1>Calendar Updates</h1></div>
 <div class="hub-calendar-actions">
 <button type="button" data-open="roster" data-select-kind="update"><span>🗓️</span><strong>Calendar Update</strong><small>Report changes to your class schedule</small></button>
 <button type="button" data-open="roster" data-select-kind="roster"><span>📋</span><strong>Weekly Roster</strong><small>Send your full or partial class listing</small></button>
@@ -84,7 +94,12 @@
 </section>
 <section id="calendarPage" class="hub-section hidden"><div class="hub-card"><div class="nh-calendar-head"><h2>Franchise Calendar</h2><button id="nhCalendarRefresh" type="button" class="secondary">↻ Refresh</button></div><p class="muted">Your class schedule and recorded availability · View only</p><p id="nhCalendarStatus" class="nh-calendar-status" role="status">Loading calendar…</p><div id="nhCalendarWeeks" class="nh-week-tabs hidden"></div><div id="nhCalendarDates" class="nh-date-grid"></div><div id="nhCalendarDetail" class="nh-day-detail"></div></div></section>
 <section id="placeholderPage" class="hub-section hidden"><div class="hub-card"><h2 id="placeholderTitle">Coming Soon</h2><p class="muted">This section will be added as NestHub develops.</p></div></section>
-<div class="hub-footer" id="hubSignOutFooter"><button id="signOut" type="button">Sign Out</button></div>
+<div class="hub-footer" id="hubSignOutFooter">
+<button type="button" data-open="roster" data-select-kind="update">Calendar Update</button>
+<button type="button" data-open="roster" data-select-kind="roster">Weekly Roster</button>
+<button type="button" data-open="calendar">View Calendar</button>
+<button id="signOut" type="button">Sign Out</button>
+</div>
 </section>
 </main></div>
 <div id="hubSubmissionPopup" class="hub-popup hidden" role="dialog" aria-modal="true" aria-labelledby="hubPopupTitle"><div class="hub-popup-card"><div id="hubPopupIcon" class="hub-popup-icon">⏳</div><h2 id="hubPopupTitle">Submitting…</h2><p id="hubPopupText">Saving your submission.</p><button type="button" id="hubPopupOk" class="primary" hidden>OK</button></div></div>
@@ -138,7 +153,7 @@ $('nhCalendarStatus').textContent=data.calendar_records.length?'Recorded availab
 }catch(error){if(request===calendarRequest)$('nhCalendarStatus').textContent='Unable to load calendar: '+(error?.message||'Unknown error')}}
 $('nhCalendarRefresh').addEventListener('click',loadCalendar);
 let contextRequest=0;
-function resetHubHeader(){$('hubWelcome').textContent='Welcome to NestHub';$('hubSaying').replaceChildren()}
+function resetHubHeader(){$('hubWelcome').replaceChildren();const first=document.createElement('span');first.textContent='Welcome';const second=document.createElement('span');second.textContent='NestHub';$('hubWelcome').append(first,second);$('hubSaying').replaceChildren()}
 async function loadHubHeader(){
 const session=readNestHubSession();if(!session?.token)return;
 const request=++contextRequest;
@@ -149,7 +164,7 @@ if(!res.ok)throw new Error(data?.message||'Unable to load franchisee context.');
 if(request!==contextRequest||!readNestHubSession()?.token)return;
 const user=data?.user||{};
 const name=user.name||user.full_name||user.preferred_name||user.first_name||'';
-$('hubWelcome').textContent=name?'Welcome. '+name:'Welcome to NestHub';
+$('hubWelcome').replaceChildren();for(const part of ['Welcome',name||'NestHub']){const line=document.createElement('span');line.textContent=part;$('hubWelcome').append(line)}
 const quote=Array.isArray(data?.teacher_quotes)?data.teacher_quotes[0]:data?.teacher_quotes;
 const lines=[quote?.quote_line_1,quote?.quote_line_2].filter(Boolean);
 const emojis=Array.isArray(data?.emojis)?data.emojis.slice(0,2).map(item=>item?.emoji).filter(Boolean):[];
