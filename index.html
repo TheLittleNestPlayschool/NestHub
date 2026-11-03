@@ -30,6 +30,10 @@
 <style>.hub-popup{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(26,38,47,.33);backdrop-filter:blur(5px)}.hub-popup-card{width:min(340px,100%);height:245px;padding:24px;background:#fff;border-radius:22px;box-shadow:0 20px 65px rgba(25,39,48,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#263449}.hub-popup-icon{font-size:34px;margin-bottom:9px}.hub-popup-card h2{margin:0 0 9px;font-size:1.3rem}.hub-popup-card p{margin:0;font-size:.9rem;line-height:1.45;color:#637282}.hub-popup-card button{margin-top:auto;width:100%}</style>
 <style>/*   NestHub header context*/
 .topbar{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}.welcome{min-width:0;text-align:center;overflow-wrap:anywhere;line-height:1.25}.quote{display:block;min-width:0;max-width:100%;font-size:.68rem;font-weight:800;line-height:1.2;overflow-wrap:anywhere}.quote .hub-quote-text{display:block}.quote .hub-quote-emojis{display:block;font-size:.74rem;margin-top:3px}@media(max-width:690px){.topbar{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:5px;padding:8px}.welcome{font-size:.68rem}.quote{display:block;font-size:.58rem}.logo{width:100px}}@media(max-width:390px){.welcome{font-size:.6rem}.quote{font-size:.51rem}.logo{width:86px}}</style>
+<style>
+/*   NestHub read-only mobile calendar*/
+.nh-calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.nh-calendar-head .secondary{font-size:.75rem;padding:8px 12px;white-space:nowrap}.nh-calendar-status{font-size:.75rem;color:#5c7282;margin:10px 0}.nh-week-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:12px 0}.nh-week-tabs button,.nh-date-grid button{font:inherit;border:1px solid #d0ddd3;border-radius:10px;background:rgba(255,255,255,.65);color:#263449;padding:9px 5px}.nh-week-tabs button{font-size:.72rem;font-weight:700}.nh-week-tabs button.active,.nh-date-grid button.active{background:#607f67;color:#fff;border-color:#607f67}.nh-date-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.nh-date-grid button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 2px;font-size:.79rem;font-weight:800}.nh-date-grid small{font-size:.59rem;font-weight:500}.nh-day-detail{margin-top:13px}.nh-day-detail h3{font-size:.91rem;margin:0 0 10px}.nh-session{background:rgba(255,255,255,.72);border:1px solid #d8e3db;border-radius:12px;padding:12px;margin-bottom:8px}.nh-session-top{display:flex;align-items:flex-start;justify-content:space-between;gap:7px;font-size:.82rem}.nh-session-top strong{line-height:1.35}.nh-session-time{color:#5c7080;font-size:.75rem;white-space:nowrap}.nh-session-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:10px}.nh-session-counts span{border-radius:8px;background:#f2f7f1;padding:7px 3px;text-align:center;font-size:.87rem;font-weight:800}.nh-session-counts small{display:block;font-size:.58rem;color:#607385;font-weight:500;margin-bottom:3px}.nh-session-closed{color:#aa4842;font-weight:800;font-size:.76rem;margin-top:7px}.nh-no-data{padding:15px 10px;text-align:center;border:1px dashed #cad9cd;border-radius:12px;color:#5f7383;font-size:.81rem;line-height:1.5}@media(max-width:390px){.nh-session-counts{gap:3px}.nh-session-counts span{padding:6px 1px}.nh-calendar-head h2{font-size:1.05rem}}
+</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
@@ -62,7 +66,7 @@
 <button type="button" id="hubSubmit" class="primary" disabled>Submit and Save</button>
 </div>
 </section>
-<section id="calendarPage" class="hub-section hidden"><div class="hub-card"><h2>Franchise Calendar</h2><p class="muted">Your class schedule and availability will appear here.</p><div class="calendar-empty"><span>🗓️</span><strong>Calendar view</strong><p>Read-only. Waiting for the NestHub calendar endpoint.</p></div></div></section>
+<section id="calendarPage" class="hub-section hidden"><div class="hub-card"><div class="nh-calendar-head"><h2>Franchise Calendar</h2><button id="nhCalendarRefresh" type="button" class="secondary">↻ Refresh</button></div><p class="muted">Your class schedule and recorded availability · View only</p><p id="nhCalendarStatus" class="nh-calendar-status" role="status">Loading calendar…</p><div id="nhCalendarWeeks" class="nh-week-tabs hidden"></div><div id="nhCalendarDates" class="nh-date-grid"></div><div id="nhCalendarDetail" class="nh-day-detail"></div></div></section>
 <section id="placeholderPage" class="hub-section hidden"><div class="hub-card"><h2 id="placeholderTitle">Coming Soon</h2><p class="muted">This section will be added as NestHub develops.</p></div></section>
 <div class="hub-footer"><button id="signOut" type="button">Sign Out</button></div>
 </section>
@@ -76,6 +80,47 @@ const loginView=$('loginView'),homeView=$('homeView'),form=$('loginForm'),button
 const drafts={roster:'',update:''};let kind='roster',submitting=false;
 const ROSTER_ENDPOINT='https://x58r-xped-p4y6.n7e.xano.io/api:nKhpVe8d/nh_roster_submit';
 const CONTEXT_ENDPOINT='https://x58r-xped-p4y6.n7e.xano.io/api:nKhpVe8d/nh_get_context';
+const CALENDAR_ENDPOINT='https://x58r-xped-p4y6.n7e.xano.io/api:nKhpVe8d/nh_session_calendar';
+let calendarRequest=0,calendarData=null,calendarWeek=0,calendarDay=0;
+const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function calendarKey(date){return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0')}
+function calendarAnchor(){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-(d.getDay()+6)%7);return d}
+function calendarDate(offset){const d=calendarAnchor();d.setDate(d.getDate()+offset);return d}
+function calendarDateKey(value){if(typeof value==='number'){const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toISOString().slice(0,10)}return String(value||'').slice(0,10)}
+function calendarSessionsOn(date){return(calendarData?.sessions||[]).filter(s=>s.is_active===true&&s.display===true&&Array.isArray(s.scheduled_days)&&s.scheduled_days.some(day=>String(day).toLowerCase()===dayNames[date.getDay()].toLowerCase())).sort((a,b)=>String(a.start_time_slot).localeCompare(String(b.start_time_slot)))}
+function renderCalendar(){
+if(!calendarData)return;
+$('nhCalendarWeeks').classList.remove('hidden');
+const tabs=$('nhCalendarWeeks');tabs.replaceChildren();
+for(let w=0;w<3;w++){const button=document.createElement('button');button.type='button';button.textContent='Week '+(w+1);button.classList.toggle('active',w===calendarWeek);button.onclick=()=>{calendarWeek=w;calendarDay=w*7;renderCalendar()};tabs.append(button)}
+const dates=$('nhCalendarDates');dates.replaceChildren();
+for(let i=0;i<7;i++){const offset=calendarWeek*7+i,d=calendarDate(offset),button=document.createElement('button');button.type='button';button.classList.toggle('active',calendarDay===offset);const day=document.createElement('small');day.textContent=dayNames[d.getDay()].slice(0,3);const number=document.createElement('strong');number.textContent=d.getDate();button.append(day,number);button.onclick=()=>{calendarDay=offset;renderCalendar()};dates.append(button)}
+const d=calendarDate(calendarDay),dateKey=calendarKey(d),detail=$('nhCalendarDetail');detail.replaceChildren();
+const title=document.createElement('h3');title.textContent=d.toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric',year:'numeric'});detail.append(title);
+const sessions=calendarSessionsOn(d);
+if(!sessions.length){const note=document.createElement('div');note.className='nh-no-data';note.textContent='No regular sessions scheduled for this day.';detail.append(note);return}
+for(const s of sessions){const record=(calendarData.calendar_records||[]).find(r=>Number(r.session_id)===Number(s.id)&&calendarDateKey(r.calendar_date)===dateKey);
+const card=document.createElement('div');card.className='nh-session',head=document.createElement('div');head.className='nh-session-top';
+const name=document.createElement('strong');name.textContent=s.name||'Class session';
+const time=document.createElement('span');time.className='nh-session-time';time.textContent=String(s.start_time_slot||'').slice(0,5)+'–'+String(s.end_time_slot||'').slice(0,5);
+head.append(name,time);card.append(head);
+if(record?.is_closed===true){const closed=document.createElement('div');closed.className='nh-session-closed';closed.textContent='Closed';card.append(closed)}
+const valid=record?.regular_count!=null,reg=valid?Number(record.regular_count):null,makeup=record?.makeup_count!=null?Number(record.makeup_count):null,trials=record?.trial_count!=null?Number(record.trial_count):null;
+const full=valid&&reg>=0&&Number.isFinite(reg)&&makeup!==null&&trials!==null;
+const total=full?reg+makeup+trials:null,capacity=Number(s.max_students);
+const open=full&&Number.isFinite(capacity)?Math.max(0,capacity-total):null;
+const counts=document.createElement('div');counts.className='nh-session-counts';
+for(const [label,val] of [['Enrolled',reg],['Makeup',record?makeup:null],['Trials',record?trials:null],['Open',record?.is_closed===true?'Closed':open]]){const item=document.createElement('span'),small=document.createElement('small');small.textContent=label;item.append(small,document.createTextNode(val===null||val===undefined||Number.isNaN(val)?'—':String(val)));counts.append(item)}
+card.append(counts);detail.append(card)}
+}
+async function loadCalendar(){
+const session=readNestHubSession();if(!session?.token)return;
+const request=++calendarRequest;calendarData=null;$('nhCalendarWeeks').classList.add('hidden');$('nhCalendarDates').replaceChildren();$('nhCalendarDetail').replaceChildren();$('nhCalendarStatus').textContent='Loading calendar…';
+const params=new URLSearchParams({start_date:calendarKey(calendarDate(0)),end_date:calendarKey(calendarDate(20))});
+try{const res=await fetch(CALENDAR_ENDPOINT+'?'+params,{headers:{Accept:'application/json',Authorization:'Bearer '+session.token}});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||data.error||'Calendar request failed');if(!Array.isArray(data.sessions)||!Array.isArray(data.calendar_records))throw new Error('Unexpected calendar response');if(request!==calendarRequest||!readNestHubSession()?.token)return;calendarData=data;calendarWeek=0;calendarDay=(new Date().getDay()+6)%7;
+$('nhCalendarStatus').textContent=data.calendar_records.length?'Recorded availability shown below. Missing counts are marked —.':'Class schedule loaded. No availability records for these dates; counts are not yet entered.';renderCalendar()
+}catch(error){if(request===calendarRequest)$('nhCalendarStatus').textContent='Unable to load calendar: '+(error?.message||'Unknown error')}}
+$('nhCalendarRefresh').addEventListener('click',loadCalendar);
 let contextRequest=0;
 function resetHubHeader(){$('hubWelcome').textContent='Welcome to NestHub';$('hubSaying').replaceChildren()}
 async function loadHubHeader(){
@@ -104,6 +149,7 @@ const primary=['dashboard','roster','calendar'];
 $('dashboardPage').classList.toggle('hidden',page!=='dashboard');
 $('rosterPage').classList.toggle('hidden',page!=='roster');
 $('calendarPage').classList.toggle('hidden',page!=='calendar');
+if(page==='calendar')loadCalendar();
 $('placeholderPage').classList.toggle('hidden',primary.includes(page));
 $('moduleBackBar').classList.toggle('hidden',page==='dashboard');
 const titles={enrollment:'Enrollment',performance:'Performance',financials:'Financials',office:'Head Office',trials:'Free Trials & Visits'};
@@ -135,7 +181,7 @@ try{const res=await fetch(ROSTER_ENDPOINT,{method:'POST',headers:{'Content-Type'
 catch(error){showSubmitPopup('Unable to submit',error instanceof Error?error.message:'Unable to save submission.','!',true)}
 finally{submitting=false;$('hubSubmit').disabled=!$('hubText').value.trim()}
 });
-$('signOut').addEventListener('click',()=>{contextRequest++;clearNestHubSession();resetHubHeader();showLogin()});
+$('signOut').addEventListener('click',()=>{contextRequest++;calendarRequest++;calendarData=null;clearNestHubSession();resetHubHeader();showLogin()});
 if(readNestHubSession())showHome();
 button.disabled=!LOGIN_ENDPOINT;
 if(LOGIN_ENDPOINT)message.textContent='';
