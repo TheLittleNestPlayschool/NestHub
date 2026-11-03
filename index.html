@@ -34,6 +34,17 @@
 /*   NestHub read-only mobile calendar*/
 .nh-calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.nh-calendar-head .secondary{font-size:.75rem;padding:8px 12px;white-space:nowrap}.nh-calendar-status{font-size:.75rem;color:#5c7282;margin:10px 0}.nh-week-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:12px 0}.nh-week-tabs button,.nh-date-grid button{font:inherit;border:1px solid #d0ddd3;border-radius:10px;background:rgba(255,255,255,.65);color:#263449;padding:9px 5px}.nh-week-tabs button{font-size:.72rem;font-weight:700}.nh-week-tabs button.active,.nh-date-grid button.active{background:#607f67;color:#fff;border-color:#607f67}.nh-date-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.nh-date-grid button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 2px;font-size:.79rem;font-weight:800}.nh-date-grid small{font-size:.59rem;font-weight:500}.nh-day-detail{margin-top:13px}.nh-day-detail h3{font-size:.91rem;margin:0 0 10px}.nh-session{background:rgba(255,255,255,.72);border:1px solid #d8e3db;border-radius:12px;padding:12px;margin-bottom:8px}.nh-session-top{display:flex;align-items:flex-start;justify-content:space-between;gap:7px;font-size:.82rem}.nh-session-top strong{line-height:1.35}.nh-session-time{color:#5c7080;font-size:.75rem;white-space:nowrap}.nh-session-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:10px}.nh-session-counts span{border-radius:8px;background:#f2f7f1;padding:7px 3px;text-align:center;font-size:.87rem;font-weight:800}.nh-session-counts small{display:block;font-size:.58rem;color:#607385;font-weight:500;margin-bottom:3px}.nh-session-closed{color:#aa4842;font-weight:800;font-size:.76rem;margin-top:7px}.nh-no-data{padding:15px 10px;text-align:center;border:1px dashed #cad9cd;border-radius:12px;color:#5f7383;font-size:.81rem;line-height:1.5}@media(max-width:390px){.nh-session-counts{gap:3px}.nh-session-counts span{padding:6px 1px}.nh-calendar-head h2{font-size:1.05rem}}
 </style>
+<style>
+/*   Calendar-only franchise home and two-line teacher quote*/
+.hub-calendar-home{max-width:720px;margin:0 auto;padding:18px}.hub-calendar-home .monitor-intro h1{font-size:1.32rem;margin:5px 0 7px}.hub-calendar-home .monitor-intro p{font-size:.79rem;line-height:1.4;margin:0 0 15px}
+.hub-calendar-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.hub-calendar-actions button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:6px;min-height:98px;padding:14px;border:1px solid rgba(255,255,255,.85);border-radius:13px;background:rgba(255,255,255,.7);color:#263449;font:inherit}
+.hub-calendar-actions button:last-child{grid-column:1/-1;min-height:80px}
+.hub-calendar-actions button span{font-size:1.3rem}.hub-calendar-actions button strong{font-size:.89rem}.hub-calendar-actions button small{font-size:.72rem;line-height:1.35;color:#637587}
+.hub-calendar-actions button:hover{background:rgba(255,255,255,.92)}
+.quote{text-align:center}.quote .hub-quote-text{display:flex;flex-direction:column;align-items:center;gap:1px}.quote .hub-quote-line{display:block;text-align:center}.quote .hub-quote-emojis{display:block;text-align:center;font-size:.78rem;margin-top:4px}
+@media(max-width:420px){.hub-calendar-home{padding:14px}.hub-calendar-actions{gap:7px}.hub-calendar-actions button{padding:10px;min-height:94px}.hub-calendar-actions button strong{font-size:.8rem}.hub-calendar-actions button small{font-size:.68rem}.quote{font-size:.52rem}}
+</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
@@ -52,23 +63,28 @@
 <p class="notice" id="loginMessage" role="status">Franchisee sign-in will be enabled after the separate Xano authentication endpoint is connected.</p>
 </section>
 <section id="homeView" class="hidden">
-<section id="dashboardPage" class="hub-section"><div class="monitor"><div class="monitor-intro"><small>THE LITTLE NEST PLAYSCHOOL</small><h1>NestHub <span>Franchise Monitor</span></h1><p>Franchise overview · Live figures coming soon</p></div><div class="monitor-section"><h2>01 — ENROLLMENT</h2><div class="monitor-grid"><div class="monitor-metric"><strong>—</strong><small>Active Students</small></div><div class="monitor-metric"><strong>—</strong><small>New This Month</small></div><div class="monitor-metric"><strong>—</strong><small>Withdrawals</small></div><div class="monitor-metric"><strong>—</strong><small>Available Spaces</small></div></div></div><div class="monitor-section"><h2>02 — VISITS & FREE TRIALS</h2><div class="monitor-grid"><div class="monitor-metric"><strong>—</strong><small>Upcoming Free Trials</small></div><div class="monitor-metric"><strong>—</strong><small>Scheduled Visits</small></div><div class="monitor-metric"><strong>—</strong><small>Awaiting Outcome</small></div><div class="monitor-metric"><strong>—</strong><small>Enrolled After Trial</small></div></div></div><div class="monitor-section"><h2>03 — CLASSROOM OPERATIONS</h2><div class="monitor-grid"><div class="monitor-metric"><strong>—</strong><small>Sessions Today</small></div><div class="monitor-metric"><strong>—</strong><small>Students Expected</small></div><div class="monitor-metric"><strong>—</strong><small>Attendance Rate</small></div><div class="monitor-metric"><strong>—</strong><small>Attendance Submitted</small></div></div></div><div class="monitor-section"><h2>04 — FRANCHISE PERFORMANCE</h2><div class="monitor-grid"><div class="monitor-metric"><strong>—</strong><small>Monthly Tuition</small></div><div class="monitor-metric"><strong>—</strong><small>New Enrollments</small></div></div></div><div class="monitor-section"><h2>05 — OPERATIONS</h2><div class="monitor-ops">
-<button type="button" data-open="roster"><span>📋</span><strong>Update Rosters</strong><small>Weekly rosters &amp; schedule updates</small></button>
-<button type="button" data-open="calendar"><span>🗓️</span><strong>View Calendar</strong><small>Read-only franchise calendar</small></button>
-</div></div></div></section>
+<section id="dashboardPage" class="hub-section">
+<div class="monitor hub-calendar-home">
+<div class="monitor-intro"><small>THE LITTLE NEST PLAYSCHOOL</small><h1>Calendar Updates</h1><p>Send class schedule changes to head office or view your calendar.</p></div>
+<div class="hub-calendar-actions">
+<button type="button" data-open="roster" data-select-kind="update"><span>🗓️</span><strong>Calendar Update</strong><small>Report changes to your class schedule</small></button>
+<button type="button" data-open="roster" data-select-kind="roster"><span>📋</span><strong>Weekly Roster</strong><small>Send your full or partial class listing</small></button>
+<button type="button" data-open="calendar"><span>📅</span><strong>View Calendar</strong><small>See your current class schedule and availability</small></button>
+</div></div>
+</section>
 <div id="moduleBackBar" class="hidden"><button type="button" id="moduleBack" class="secondary">← Dashboard</button></div>
 <section id="rosterPage" class="hub-section hidden">
-<div class="hub-choices"><button type="button" class="hub-choice chosen" data-kind="roster">📋 Weekly Roster</button><button type="button" class="hub-choice" data-kind="update">🗓️ Calendar Update</button></div>
+<div class="hub-choices"><button type="button" class="hub-choice chosen" data-kind="update">🗓️ Calendar Update</button><button type="button" class="hub-choice" data-kind="roster">📋 Weekly Roster</button></div>
 <div id="hubEditor" class="hub-card">
-<h2 id="hubTitle">Submit Weekly Roster</h2><p id="hubHelp" class="muted">Copy your Facebook class roster and paste it below. A full week or partial roster is fine.</p>
-<label for="hubText" id="hubLabel">Paste class roster</label>
-<textarea id="hubText" placeholder="Paste the class roster from Facebook here…" spellcheck="false"></textarea>
+<h2 id="hubTitle">Report Calendar Update</h2><p id="hubHelp" class="muted">Tell head office what changed. Include the date and session time.</p>
+<label for="hubText" id="hubLabel">What has changed?</label>
+<textarea id="hubText" placeholder="Example: Tuesday, Nov 5, 8:30 session — add 1 makeup session." spellcheck="false"></textarea>
 <button type="button" id="hubSubmit" class="primary" disabled>Submit and Save</button>
 </div>
 </section>
 <section id="calendarPage" class="hub-section hidden"><div class="hub-card"><div class="nh-calendar-head"><h2>Franchise Calendar</h2><button id="nhCalendarRefresh" type="button" class="secondary">↻ Refresh</button></div><p class="muted">Your class schedule and recorded availability · View only</p><p id="nhCalendarStatus" class="nh-calendar-status" role="status">Loading calendar…</p><div id="nhCalendarWeeks" class="nh-week-tabs hidden"></div><div id="nhCalendarDates" class="nh-date-grid"></div><div id="nhCalendarDetail" class="nh-day-detail"></div></div></section>
 <section id="placeholderPage" class="hub-section hidden"><div class="hub-card"><h2 id="placeholderTitle">Coming Soon</h2><p class="muted">This section will be added as NestHub develops.</p></div></section>
-<div class="hub-footer"><button id="signOut" type="button">Sign Out</button></div>
+<div class="hub-footer" id="hubSignOutFooter"><button id="signOut" type="button">Sign Out</button></div>
 </section>
 </main></div>
 <div id="hubSubmissionPopup" class="hub-popup hidden" role="dialog" aria-modal="true" aria-labelledby="hubPopupTitle"><div class="hub-popup-card"><div id="hubPopupIcon" class="hub-popup-icon">⏳</div><h2 id="hubPopupTitle">Submitting…</h2><p id="hubPopupText">Saving your submission.</p><button type="button" id="hubPopupOk" class="primary" hidden>OK</button></div></div>
@@ -77,7 +93,7 @@ import{LOGIN_ENDPOINT,signInNestHub,readNestHubSession,clearNestHubSession}from'
 /*   NestHub login and mobile franchise workspace*/
 const $=id=>document.getElementById(id);
 const loginView=$('loginView'),homeView=$('homeView'),form=$('loginForm'),button=$('signInButton'),message=$('loginMessage');
-const drafts={roster:'',update:''};let kind='roster',submitting=false;
+const drafts={roster:'',update:''};let kind='update',submitting=false;
 const ROSTER_ENDPOINT='https://x58r-xped-p4y6.n7e.xano.io/api:nKhpVe8d/nh_roster_submit';
 const CONTEXT_ENDPOINT='https://x58r-xped-p4y6.n7e.xano.io/api:nKhpVe8d/nh_get_context';
 const CALENDAR_ENDPOINT='https://x58r-xped-p4y6.n7e.xano.io/api:nKhpVe8d/nh_session_calendar';
@@ -138,7 +154,7 @@ const quote=Array.isArray(data?.teacher_quotes)?data.teacher_quotes[0]:data?.tea
 const lines=[quote?.quote_line_1,quote?.quote_line_2].filter(Boolean);
 const emojis=Array.isArray(data?.emojis)?data.emojis.slice(0,2).map(item=>item?.emoji).filter(Boolean):[];
 const target=$('hubSaying');target.replaceChildren();
-if(lines.length){const words=document.createElement('span');words.className='hub-quote-text';words.textContent='“'+lines.join(' ')+'”';target.append(words)}
+if(lines.length){const words=document.createElement('span');words.className='hub-quote-text';lines.forEach((line,i)=>{const part=document.createElement('span');part.className='hub-quote-line';part.textContent=(i===0?'“':'')+line+(i===lines.length-1?'”':'');words.append(part)});target.append(words)}
 if(lines.length&&emojis.length){const icons=document.createElement('span');icons.className='hub-quote-emojis';icons.textContent=emojis.join('  ');target.append(icons)}
 }catch(error){if(request===contextRequest)console.warn('NestHub context unavailable:',error?.message||error)}
 }
@@ -152,6 +168,7 @@ $('calendarPage').classList.toggle('hidden',page!=='calendar');
 if(page==='calendar')loadCalendar();
 $('placeholderPage').classList.toggle('hidden',primary.includes(page));
 $('moduleBackBar').classList.toggle('hidden',page==='dashboard');
+$('hubSignOutFooter').classList.toggle('hidden',page!=='dashboard');
 const titles={enrollment:'Enrollment',performance:'Performance',financials:'Financials',office:'Head Office',trials:'Free Trials & Visits'};
 if(titles[page])$('placeholderTitle').textContent=titles[page];
 window.scrollTo({top:0,behavior:'smooth'});
@@ -162,12 +179,12 @@ drafts[kind]=$('hubText').value;kind=next;
 document.querySelectorAll('[data-kind]').forEach(b=>b.classList.toggle('chosen',b.dataset.kind===kind));
 const roster=kind==='roster';
 $('hubTitle').textContent=roster?'Submit Weekly Roster':'Report Calendar Update';
-$('hubHelp').textContent=roster?'Copy your Facebook class roster and paste it below. A full week or partial roster is fine.':'Tell head office what changed. Include the day and session time when relevant.';
+$('hubHelp').textContent=roster?'Paste your full week class listing. It’s OK to send a partial listing too.':'Tell head office what changed. Include the date and session time.';
 $('hubLabel').textContent=roster?'Paste class roster':'What has changed?';
-$('hubText').placeholder=roster?'Paste the class roster from Facebook here…':'Example: Wednesday afternoon class now has 2 enrolled children.';
+$('hubText').placeholder=roster?'Paste your full week class listing here…':'Example: Tuesday, Nov 5, 8:30 session — add 1 makeup session.';
 $('hubText').value=drafts[kind];$('hubSubmit').disabled=!$('hubText').value.trim();
 }
-document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.open)));
+document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.selectKind)showKind(b.dataset.selectKind);showPage(b.dataset.open)}));
 $('moduleBack').addEventListener('click',()=>showPage('dashboard'));
 document.querySelectorAll('[data-kind]').forEach(b=>b.addEventListener('click',()=>showKind(b.dataset.kind)));
 $('hubText').addEventListener('input',()=>{drafts[kind]=$('hubText').value;$('hubSubmit').disabled=!drafts[kind].trim()});
