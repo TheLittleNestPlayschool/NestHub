@@ -59,6 +59,52 @@
 .hub-footer #signOut{margin-left:auto;background:rgba(255,255,255,.67)}
 @media(max-width:480px){.hub-footer{gap:5px}.hub-footer button{font-size:.61rem;padding:8px 3px;min-height:42px}}
 </style>
+
+<style>
+/*   NestHub simple messaging module*/
+.hub-calendar-actions:has([data-open="messages"]) button:last-child{grid-column:auto;min-height:98px}
+.main:has(#messagesPage:not(.hidden)){padding:14px 14px 35px}
+#homeView:has(#messagesPage:not(.hidden)){max-width:1160px}
+.nh-talk{padding:0;overflow:hidden;min-height:520px}
+.nh-talk-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px 18px;border-bottom:1px solid #dae2df}
+.nh-talk-top h2{margin:0 0 3px;font-size:1.1rem}
+.nh-talk-top p{margin:0;font-size:.74rem;color:#627484}
+.nh-talk-top button{padding:8px 12px;font-size:.74rem}
+.nh-talk-grid{display:grid;grid-template-columns:320px minmax(0,1fr);height:min(70vh,690px);min-height:465px}
+.nh-talk-list-panel{display:flex;flex-direction:column;min-height:0;border-right:1px solid #dae2df;background:rgba(248,251,249,.55)}
+.nh-talk-list-header{padding:12px 13px 7px;font-size:.72rem;color:#607387}
+.nh-talk-list{flex:1;min-height:0;overflow-y:auto;padding:4px 9px 10px}
+.nh-talk-conversation{display:block;text-align:left;width:100%;padding:12px 10px;border:1px solid transparent;border-radius:11px;background:transparent;color:#293e4c;margin:3px 0}
+.nh-talk-conversation:hover{background:#edf4ee}
+.nh-talk-conversation.active{background:#e4eee5;border-color:#b9d2bd}
+.nh-talk-item-top{display:flex;align-items:center;justify-content:space-between;gap:9px}
+.nh-talk-item-top strong{font-size:.8rem;line-height:1.3;overflow-wrap:anywhere}
+.nh-talk-item-top span{font-size:.62rem;color:#73818c;white-space:nowrap}
+.nh-talk-item-meta{font-size:.69rem;color:#647787;margin-top:6px}
+.nh-talk-thread{display:flex;flex-direction:column;min-width:0;min-height:0;background:rgba(255,255,255,.55)}
+.nh-talk-thread-head{padding:15px 17px;border-bottom:1px solid #dae2df}
+.nh-talk-thread-head strong{display:block;font-size:.9rem}
+.nh-talk-thread-head span{display:block;font-size:.7rem;color:#697b88;margin-top:4px}
+.nh-talk-status{font-size:.73rem;color:#657888;padding:8px 12px;min-height:30px;line-height:1.35}
+.nh-talk-status.error{color:#b04038}
+.nh-talk-messages{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:11px;padding:12px 17px}
+.nh-talk-empty{color:#73818d;text-align:center;margin:auto;font-size:.82rem;line-height:1.6}
+.nh-talk-bubble-wrap{max-width:80%;align-self:flex-start;display:flex;flex-direction:column;gap:4px}
+.nh-talk-bubble-wrap.mine{align-self:flex-end}
+.nh-talk-sender{font-size:.64rem;color:#627685}
+.nh-talk-bubble{padding:10px 12px;border-radius:12px;background:#edf2ed;border:1px solid #d9e3da;color:#2b3c44;font-size:.81rem;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.nh-talk-bubble-wrap.mine .nh-talk-bubble{background:#e0f2e5;border-color:#c2dbc8}
+.nh-talk-time{color:#75818a;font-size:.62rem}
+.nh-talk-bubble-wrap.mine .nh-talk-time{text-align:right}
+.nh-talk-compose{border-top:1px solid #d8e0dc;padding:11px 14px 13px;background:rgba(255,255,255,.74)}
+.nh-talk-compose textarea{display:block;width:100%;min-height:72px;max-height:145px;resize:vertical;font:inherit;font-size:.83rem;line-height:1.4;padding:10px 12px;border-radius:11px;border:1px solid #cbd5d1;background:#fff;color:#263449}
+.nh-talk-compose textarea:disabled{background:#f0f2f1;color:#87929b}
+.nh-talk-compose-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px}
+.nh-talk-compose-actions span{font-size:.66rem;color:#677b88;line-height:1.3}
+.nh-talk-compose-actions button{padding:9px 15px;font-size:.75rem;white-space:nowrap}
+.nh-talk-compose-actions button:disabled{opacity:.52;cursor:default}
+@media(max-width:700px){.nh-talk-grid{grid-template-columns:1fr;grid-template-rows:185px minmax(0,1fr);height:calc(100vh - 245px);min-height:510px}.nh-talk-list-panel{border-right:0;border-bottom:1px solid #dae2df}.nh-talk-top{padding:12px}.nh-talk-thread-head{padding:10px 12px}.nh-talk-messages{padding:10px 12px}.nh-talk-compose{padding:9px}.nh-talk-bubble-wrap{max-width:90%}}
+</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
@@ -84,6 +130,7 @@
 <button type="button" data-open="roster" data-select-kind="update"><span>🗓️</span><strong>Calendar Update</strong><small>Report changes to your class schedule</small></button>
 <button type="button" data-open="roster" data-select-kind="roster"><span>📋</span><strong>Weekly Roster</strong><small>Send your full or partial class listing</small></button>
 <button type="button" data-open="calendar"><span>📅</span><strong>View Calendar</strong><small>See your current class schedule and availability</small></button>
+<button type="button" data-open="messages"><span>💬</span><strong>Messages</strong><small>Talk with Head Office and your team</small></button>
 </div></div>
 </section>
 <div id="moduleBackBar" class="hidden"><button type="button" id="moduleBack" class="secondary">← Dashboard</button></div>
@@ -103,6 +150,28 @@
 <div class="nh-cal-scroll" id="nhCalendarScroll" tabindex="0" aria-label="Scrollable three-week session calendar"><div class="nh-cal-inner"><div class="nh-cal-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div><div id="nhCalendarGrid"></div></div></div>
 <div class="nh-cal-legend"><span><i class="nh-cal-dot"></i>Today</span><span><i class="nh-cal-dot unset"></i>Not yet updated</span><span><i class="nh-cal-dot closed"></i>Closed</span></div>
 </div></section>
+
+<section id="messagesPage" class="hub-section hidden">
+<div class="hub-card nh-talk">
+<div class="nh-talk-top"><div><h2>Messages</h2><p>Conversations for your playschool</p></div><button id="nhTalkRefresh" type="button" class="secondary">Refresh</button></div>
+<div class="nh-talk-grid">
+<aside class="nh-talk-list-panel">
+<div id="nhTalkListStatus" class="nh-talk-list-header" role="status">Loading conversations…</div>
+<div id="nhTalkConversations" class="nh-talk-list"></div>
+</aside>
+<div class="nh-talk-thread">
+<div class="nh-talk-thread-head"><strong id="nhTalkSubject">Select a conversation</strong><span id="nhTalkDetails">Messages appear here.</span></div>
+<div id="nhTalkStatus" class="nh-talk-status" role="status"></div>
+<div id="nhTalkMessages" class="nh-talk-messages"><p class="nh-talk-empty">Select a conversation to read messages.</p></div>
+<form id="nhTalkForm" class="nh-talk-compose">
+<label for="nhTalkText" class="hidden">Write a message</label>
+<textarea id="nhTalkText" placeholder="Select a conversation…" disabled></textarea>
+<div class="nh-talk-compose-actions"><span id="nhTalkHint">Select a conversation first.</span><button id="nhTalkSend" type="submit" class="secondary" disabled>Send</button></div>
+</form>
+</div>
+</div>
+</div>
+</section>
 <section id="placeholderPage" class="hub-section hidden"><div class="hub-card"><h2 id="placeholderTitle">Coming Soon</h2><p class="muted">This section will be added as NestHub develops.</p></div></section>
 <div class="hub-footer" id="hubSignOutFooter">
 <button type="button" disabled aria-hidden="true" tabindex="-1"></button>
@@ -191,11 +260,13 @@ if(lines.length&&emojis.length){const icons=document.createElement('span');icons
 function showHome(){loginView.classList.add('hidden');homeView.classList.remove('hidden');showPage('dashboard');resetHubHeader();loadHubHeader()}
 function showLogin(){homeView.classList.add('hidden');loginView.classList.remove('hidden')}
 function showPage(page){
-const primary=['dashboard','roster','calendar'];
+const primary=['dashboard','roster','calendar','messages'];
 $('dashboardPage').classList.toggle('hidden',page!=='dashboard');
 $('rosterPage').classList.toggle('hidden',page!=='roster');
 $('calendarPage').classList.toggle('hidden',page!=='calendar');
+$('messagesPage').classList.toggle('hidden',page!=='messages');
 if(page==='calendar')loadCalendar();
+if(page==='messages')loadHubMessages();
 $('placeholderPage').classList.toggle('hidden',primary.includes(page));
 $('moduleBackBar').classList.toggle('hidden',page==='dashboard');
 $('hubSignOutFooter').classList.toggle('hidden',page!=='dashboard');
@@ -229,6 +300,133 @@ catch(error){showSubmitPopup('Unable to submit',error instanceof Error?error.mes
 finally{submitting=false;$('hubSubmit').disabled=!$('hubText').value.trim()}
 });
 $('signOut').addEventListener('click',()=>{contextRequest++;calendarRequest++;calendarData=null;clearNestHubSession();resetHubHeader();showLogin()});
+
+/*   NestHub messaging — franchise oversight and participant replies*/
+const TALK_API='https://x58r-xped-p4y6.n7e.xano.io/api:o_oYSIFY/';
+let talkConversations=[],talkCurrent=null,talkLoadSeq=0,talkMessageSeq=0,talkCanSend=false,talkSending=false;
+function talkList(data,keys){
+if(Array.isArray(data))return data;
+if(!data||typeof data!=='object')return [];
+for(const key of keys)if(Array.isArray(data[key]))return data[key];
+if(data.result)return talkList(data.result,keys);
+if(data.data)return talkList(data.data,keys);
+return [];
+}
+function talkEl(tag,cls,content){
+const el=document.createElement(tag);if(cls)el.className=cls;
+el.textContent=String(content??'');return el;
+}
+function talkDate(stamp){
+const time=Number(stamp);if(!Number.isFinite(time)||time<=0)return '';
+return new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(time));
+}
+function talkName(row){return String(row.subject||'Conversation #'+row.id)}
+async function talkRequest(endpoint,params={},method='GET'){
+const token=readNestHubSession()?.token;if(!token)throw new Error('Please sign in again.');
+const url=new URL(endpoint,TALK_API);
+const headers={Authorization:'Bearer '+token,Accept:'application/json'};
+let body;
+if(method==='GET')for(const [key,value]of Object.entries(params))url.searchParams.set(key,String(value));
+else{headers['Content-Type']='application/json';body=JSON.stringify(params)}
+const res=await fetch(url.toString(),{method,headers,body,cache:'no-store'});
+const data=await res.json().catch(()=>({}));
+if(!res.ok)throw new Error(data.message||data.error||'Messaging request failed ('+res.status+').');
+return data;
+}
+function talkComposer(){
+const enabled=Boolean(talkCurrent&&talkCanSend&&!talkSending);
+$('nhTalkText').disabled=!enabled;
+$('nhTalkSend').disabled=!enabled||!$('nhTalkText').value.trim();
+$('nhTalkSend').textContent=talkSending?'Sending…':'Send';
+$('nhTalkHint').textContent=talkSending?'Sending…':!talkCurrent?'Select a conversation first.':talkCanSend?'Reply as franchise owner.':'Read only — not a participant.';
+$('nhTalkText').placeholder=enabled?'Write a message…':'Select a conversation…';
+}
+function talkRenderList(){
+const list=$('nhTalkConversations');list.replaceChildren();
+if(!talkConversations.length){list.append(talkEl('p','nh-talk-empty','No branch conversations yet.'));return}
+for(const row of talkConversations){
+const btn=talkEl('button','nh-talk-conversation'+(String(talkCurrent)===String(row.id)?' active':''),'');btn.type='button';
+const head=talkEl('div','nh-talk-item-top','');
+head.append(talkEl('strong','',talkName(row)),talkEl('span','',talkDate(row.last_message_at||row.updated_at)));
+btn.append(head,talkEl('div','nh-talk-item-meta','Conversation #'+row.id+' · '+(row.conversation_type||'direct')));
+btn.addEventListener('click',()=>talkSelect(row));
+list.append(btn);
+}
+}
+async function loadHubMessages(){
+const seq=++talkLoadSeq;
+$('nhTalkListStatus').classList.remove('error');
+$('nhTalkListStatus').textContent='Loading conversations…';
+try{
+const data=await talkRequest('comm_franchise_conversation_list');
+if(seq!==talkLoadSeq)return;
+talkConversations=talkList(data,['conversation_list','conversations','franchise_conversations','results','items']).map(x=>x.conversation||x.comm_conversation||x).filter(x=>x?.id!=null);
+talkConversations.sort((a,b)=>Number(b.last_message_at||b.updated_at||0)-Number(a.last_message_at||a.updated_at||0));
+$('nhTalkListStatus').textContent=talkConversations.length+' conversation'+(talkConversations.length===1?'':'s');
+talkRenderList();
+const active=talkConversations.find(row=>String(row.id)===String(talkCurrent));
+if(active)talkSelect(active);
+}catch(error){if(seq!==talkLoadSeq)return;$('nhTalkListStatus').textContent=error.message;$('nhTalkListStatus').classList.add('error')}
+}
+function talkRenderMessages(messages){
+const list=$('nhTalkMessages');list.replaceChildren();
+if(!messages.length){list.append(talkEl('p','nh-talk-empty','No messages in this conversation.'));return}
+const myId=Number(readNestHubSession()?.user?.id);
+for(const msg of messages){
+const mine=msg.sender_type==='owner'&&Number(msg.sender_id)===myId;
+const bubble=talkEl('article','nh-talk-bubble-wrap'+(mine?' mine':''),'');
+const type=String(msg.sender_type||'participant');
+bubble.append(talkEl('div','nh-talk-sender',mine?'You':type.charAt(0).toUpperCase()+type.slice(1)+' #'+msg.sender_id));
+bubble.append(talkEl('div','nh-talk-bubble',Number(msg.deleted_at)>0?'[Message deleted]':msg.message_text||''));
+bubble.append(talkEl('div','nh-talk-time',talkDate(msg.created_at)));
+list.append(bubble);
+}
+list.scrollTop=list.scrollHeight;
+}
+async function talkSelect(row){
+talkCurrent=row.id;
+talkCanSend=false;
+talkComposer();talkRenderList();
+const seq=++talkMessageSeq;
+$('nhTalkSubject').textContent=talkName(row);
+$('nhTalkDetails').textContent='Conversation #'+row.id;
+$('nhTalkStatus').classList.remove('error');$('nhTalkStatus').textContent='Loading messages…';
+$('nhTalkMessages').replaceChildren();
+const results=await Promise.allSettled([
+talkRequest('comm_franchise_message_list',{conversation_id:row.id}),
+talkRequest('comm_franchise_participant_list',{conversation_id:row.id})
+]);
+if(seq!==talkMessageSeq)return;
+if(results[0].status==='fulfilled'){
+const messages=talkList(results[0].value,['messages','message_list','results','items']);
+messages.sort((a,b)=>Number(a.created_at||0)-Number(b.created_at||0));
+talkRenderMessages(messages);
+$('nhTalkStatus').textContent=messages.length+' message'+(messages.length===1?'':'s');
+}else{$('nhTalkStatus').textContent=results[0].reason.message;$('nhTalkStatus').classList.add('error')}
+if(results[1].status==='fulfilled'){
+const participants=talkList(results[1].value,['participants','participant_list','results','items']);
+const ownerId=Number(readNestHubSession()?.user?.id);
+talkCanSend=participants.some(p=>p.participant_type==='owner'&&Number(p.participant_id)===ownerId&&p.is_active!==false);
+}else{$('nhTalkStatus').textContent='Unable to verify reply permissions.';$('nhTalkStatus').classList.add('error')}
+talkComposer();
+}
+$('nhTalkRefresh').addEventListener('click',loadHubMessages);
+$('nhTalkText').addEventListener('input',talkComposer);
+$('nhTalkForm').addEventListener('submit',async event=>{
+event.preventDefault();
+if(!talkCurrent||!talkCanSend||talkSending)return;
+const text=$('nhTalkText').value.trim();if(!text)return;
+const conversationId=talkCurrent;talkSending=true;talkComposer();
+try{
+await talkRequest('comm_franchise_message_send',{conversation_id:conversationId,message_text:text,reply_to_message_id:0},'POST');
+$('nhTalkText').value='';
+const row=talkConversations.find(x=>String(x.id)===String(conversationId));
+if(row)await talkSelect(row);
+await loadHubMessages();
+}catch(error){$('nhTalkStatus').textContent=error.message;$('nhTalkStatus').classList.add('error')}
+finally{talkSending=false;talkComposer()}
+});
+
 if(readNestHubSession())showHome();
 button.disabled=!LOGIN_ENDPOINT;
 if(LOGIN_ENDPOINT)message.textContent='';
