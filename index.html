@@ -444,7 +444,8 @@ for(const msg of messages){
 const mine=myId>0&&msg.sender_type==='owner'&&Number(msg.sender_id)===myId;
 const bubble=talkEl('article','nh-talk-bubble-wrap'+(mine?' mine':''),'');
 const type=String(msg.sender_type||'participant');
-const sender=String(msg.sender_name||'').trim()||(mine?'You':type.charAt(0).toUpperCase()+type.slice(1)+' #'+msg.sender_id);
+const senderName=String(msg.sender_name||'').trim();
+const sender=type==='admin'?'Head Office · '+(senderName||'Admin #'+msg.sender_id):(senderName||(mine?'You':type.charAt(0).toUpperCase()+type.slice(1)+' #'+msg.sender_id));
 bubble.append(talkEl('div','nh-talk-bubble',Number(msg.deleted_at)>0?'[Message deleted]':msg.message_text||''));
 bubble.append(talkEl('div','nh-talk-time',sender+' · '+talkDate(msg.created_at)));
 list.append(bubble);
