@@ -137,6 +137,15 @@
 .nh-talk-compose textarea{min-height:68px;max-height:120px}
 }
 </style>
+
+<style>
+/*   NestHub Messenger-style message alignment*/
+.nh-talk-bubble-wrap.mine{margin-left:auto;align-self:flex-end;align-items:flex-end}
+.nh-talk-bubble-wrap.mine .nh-talk-sender,.nh-talk-bubble-wrap.mine .nh-talk-time{text-align:right}
+.nh-talk-bubble-wrap.mine .nh-talk-bubble{background:#dcefe4;border-color:#b9d8c5}
+.nh-talk-bubble-wrap:not(.mine){margin-right:auto;align-self:flex-start;align-items:flex-start}
+.nh-talk-bubble-wrap:not(.mine) .nh-talk-bubble{background:#f0f1ef;border-color:#dce3df}
+</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
@@ -427,12 +436,12 @@ const active=talkConversations.find(row=>String(row.id)===String(talkCurrent));
 if(active)talkSelect(active);
 }catch(error){if(seq!==talkLoadSeq)return;$('nhTalkListStatus').textContent=error.message;$('nhTalkListStatus').classList.add('error')}
 }
-function talkRenderMessages(messages){
+function talkRenderMessages(messages,ownerId){
 const list=$('nhTalkMessages');list.replaceChildren();
 if(!messages.length){list.append(talkEl('p','nh-talk-empty','No messages in this conversation.'));return}
-const myId=Number(readNestHubSession()?.user?.id);
+const myId=Number(ownerId)||0;
 for(const msg of messages){
-const mine=msg.sender_type==='owner'&&Number(msg.sender_id)===myId;
+const mine=myId>0&&msg.sender_type==='owner'&&Number(msg.sender_id)===myId;
 const bubble=talkEl('article','nh-talk-bubble-wrap'+(mine?' mine':''),'');
 const type=String(msg.sender_type||'participant');
 bubble.append(talkEl('div','nh-talk-sender',mine?'You':type.charAt(0).toUpperCase()+type.slice(1)+' #'+msg.sender_id));
@@ -461,7 +470,8 @@ if(seq!==talkMessageSeq)return;
 if(results[0].status==='fulfilled'){
 const messages=talkList(results[0].value,['messages','message_list','results','items']);
 messages.sort((a,b)=>Number(a.created_at||0)-Number(b.created_at||0));
-talkRenderMessages(messages);
+const ownerId=results[2].status==='fulfilled'?Number(results[2].value)||0:0;
+talkRenderMessages(messages,ownerId);
 $('nhTalkStatus').textContent=messages.length+' message'+(messages.length===1?'':'s');
 }else{$('nhTalkStatus').textContent=results[0].reason.message;$('nhTalkStatus').classList.add('error')}
 if(results[1].status==='fulfilled'){
