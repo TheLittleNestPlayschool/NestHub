@@ -122,6 +122,21 @@
 .hub-messaging-chevron{font-size:1.8rem;color:#6c8b7a}
 @media(max-width:420px){.hub-home-sections{gap:11px}.hub-messaging-home{padding:14px}.hub-messaging-entry{padding:12px;min-height:80px}.hub-messaging-home .monitor-intro h1{font-size:1.16rem}}
 </style>
+
+<style>
+/*   NestHub mobile messaging — conversation list or full thread*/
+.nh-talk-back{display:none;border:0;background:none;color:#376d57;font-weight:800;font-size:.73rem;padding:0 0 8px;text-align:left}
+@media(max-width:700px){
+.nh-talk-grid{display:block;height:calc(100dvh - 205px);min-height:440px}
+.nh-talk-list-panel{height:100%;border:0}
+.nh-talk-thread{display:none;height:100%}
+.nh-talk-grid.has-active .nh-talk-list-panel{display:none}
+.nh-talk-grid.has-active .nh-talk-thread{display:flex}
+.nh-talk-back{display:block}
+.nh-talk-messages{flex:1;min-height:0}
+.nh-talk-compose textarea{min-height:68px;max-height:120px}
+}
+</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
@@ -187,7 +202,7 @@
 <div id="nhTalkConversations" class="nh-talk-list"></div>
 </aside>
 <div class="nh-talk-thread">
-<div class="nh-talk-thread-head"><strong id="nhTalkSubject">Select a conversation</strong><span id="nhTalkDetails">Messages appear here.</span></div>
+<div class="nh-talk-thread-head"><button id="nhTalkBack" type="button" class="nh-talk-back" aria-label="Back to conversations">← Conversations</button><strong id="nhTalkSubject">Select a conversation</strong><span id="nhTalkDetails">Messages appear here.</span></div>
 <div id="nhTalkStatus" class="nh-talk-status" role="status"></div>
 <div id="nhTalkMessages" class="nh-talk-messages"><p class="nh-talk-empty">Select a conversation to read messages.</p></div>
 <form id="nhTalkForm" class="nh-talk-compose">
@@ -274,6 +289,7 @@ const data=await res.json().catch(()=>({}));
 if(!res.ok)throw new Error(data?.message||'Unable to load franchisee context.');
 if(request!==contextRequest||!readNestHubSession()?.token)return;
 const user=data?.user||{};
+hubOwnerId=Number(user.id)||hubOwnerId;
 const name=user.name||user.full_name||user.preferred_name||user.first_name||'';
 $('hubWelcome').replaceChildren();for(const part of ['Welcome',name||'NestHub']){const line=document.createElement('span');line.textContent=part;$('hubWelcome').append(line)}
 const quote=Array.isArray(data?.teacher_quotes)?data.teacher_quotes[0]:data?.teacher_quotes;
@@ -326,11 +342,27 @@ try{const res=await fetch(ROSTER_ENDPOINT,{method:'POST',headers:{'Content-Type'
 catch(error){showSubmitPopup('Unable to submit',error instanceof Error?error.message:'Unable to save submission.','!',true)}
 finally{submitting=false;$('hubSubmit').disabled=!$('hubText').value.trim()}
 });
-$('signOut').addEventListener('click',()=>{contextRequest++;calendarRequest++;calendarData=null;clearNestHubSession();resetHubHeader();showLogin()});
+$('signOut').addEventListener('click',()=>{contextRequest++;calendarRequest++;calendarData=null;hubOwnerId=0;talkCurrent=null;talkCanSend=false;talkConversations=[];talkMessageSeq++;talkLoadSeq++;$('messagesPage').querySelector('.nh-talk-grid').classList.remove('has-active');clearNestHubSession();resetHubHeader();showLogin()});
 
 /*   NestHub messaging — franchise oversight and participant replies*/
 const TALK_API='https://x58r-xped-p4y6.n7e.xano.io/api:o_oYSIFY/';
-let talkConversations=[],talkCurrent=null,talkLoadSeq=0,talkMessageSeq=0,talkCanSend=false,talkSending=false;
+let talkConversations=[],talkCurrent=null,talkLoadSeq=0,talkMessageSeq=0,talkCanSend=false,talkSending=false,hubOwnerId=0;
+let talkOwnerLookup=null;
+async function talkResolveOwnerId(){
+const saved=Number(readNestHubSession()?.user?.id)||0;
+if(saved>0)return saved;
+if(hubOwnerId>0)return hubOwnerId;
+if(!talkOwnerLookup)talkOwnerLookup=(async()=>{
+const token=readNestHubSession()?.token;if(!token)throw new Error('Please sign in again.');
+const res=await fetch(CONTEXT_ENDPOINT,{headers:{Accept:'application/json',Authorization:'Bearer '+token},cache:'no-store'});
+const data=await res.json().catch(()=>({}));
+if(!res.ok)throw new Error(data.message||'Could not identify the signed-in owner.');
+const id=Number(data?.user?.id??data?.franchise_user?.id)||0;
+if(id>0)hubOwnerId=id;
+return id;
+})().finally(()=>{talkOwnerLookup=null});
+return talkOwnerLookup;
+}
 function talkList(data,keys){
 if(Array.isArray(data))return data;
 if(!data||typeof data!=='object')return [];
@@ -412,6 +444,7 @@ list.scrollTop=list.scrollHeight;
 }
 async function talkSelect(row){
 talkCurrent=row.id;
+$('messagesPage').querySelector('.nh-talk-grid').classList.add('has-active');
 talkCanSend=false;
 talkComposer();talkRenderList();
 const seq=++talkMessageSeq;
@@ -421,7 +454,8 @@ $('nhTalkStatus').classList.remove('error');$('nhTalkStatus').textContent='Loadi
 $('nhTalkMessages').replaceChildren();
 const results=await Promise.allSettled([
 talkRequest('comm_franchise_message_list',{conversation_id:row.id}),
-talkRequest('comm_franchise_participant_list',{conversation_id:row.id})
+talkRequest('comm_franchise_participant_list',{conversation_id:row.id}),
+talkResolveOwnerId()
 ]);
 if(seq!==talkMessageSeq)return;
 if(results[0].status==='fulfilled'){
@@ -431,12 +465,14 @@ talkRenderMessages(messages);
 $('nhTalkStatus').textContent=messages.length+' message'+(messages.length===1?'':'s');
 }else{$('nhTalkStatus').textContent=results[0].reason.message;$('nhTalkStatus').classList.add('error')}
 if(results[1].status==='fulfilled'){
-const participants=talkList(results[1].value,['participants','participant_list','results','items']);
-const ownerId=Number(readNestHubSession()?.user?.id);
-talkCanSend=participants.some(p=>p.participant_type==='owner'&&Number(p.participant_id)===ownerId&&p.is_active!==false);
+const participants=talkList(results[1].value,['participants','participant_list','conversation_participants','participant_records','records','results','items']);
+const ownerId=results[2].status==='fulfilled'?Number(results[2].value)||0:0;
+talkCanSend=ownerId>0&&participants.some(p=>p.participant_type==='owner'&&Number(p.participant_id)===ownerId&&p.is_active!==false);
+if(!ownerId){$('nhTalkStatus').textContent='Unable to identify this owner account. Please refresh and try again.';$('nhTalkStatus').classList.add('error')}
 }else{$('nhTalkStatus').textContent='Unable to verify reply permissions.';$('nhTalkStatus').classList.add('error')}
 talkComposer();
 }
+$('nhTalkBack').addEventListener('click',()=>{$('messagesPage').querySelector('.nh-talk-grid').classList.remove('has-active')});
 $('nhTalkRefresh').addEventListener('click',loadHubMessages);
 $('nhTalkText').addEventListener('input',talkComposer);
 $('nhTalkForm').addEventListener('submit',async event=>{
