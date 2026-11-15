@@ -444,9 +444,9 @@ for(const msg of messages){
 const mine=myId>0&&msg.sender_type==='owner'&&Number(msg.sender_id)===myId;
 const bubble=talkEl('article','nh-talk-bubble-wrap'+(mine?' mine':''),'');
 const type=String(msg.sender_type||'participant');
-bubble.append(talkEl('div','nh-talk-sender',mine?'You':type.charAt(0).toUpperCase()+type.slice(1)+' #'+msg.sender_id));
+const sender=mine?'You':type.charAt(0).toUpperCase()+type.slice(1)+' #'+msg.sender_id;
 bubble.append(talkEl('div','nh-talk-bubble',Number(msg.deleted_at)>0?'[Message deleted]':msg.message_text||''));
-bubble.append(talkEl('div','nh-talk-time',talkDate(msg.created_at)));
+bubble.append(talkEl('div','nh-talk-time',sender+' · '+talkDate(msg.created_at)));
 list.append(bubble);
 }
 list.scrollTop=list.scrollHeight;
