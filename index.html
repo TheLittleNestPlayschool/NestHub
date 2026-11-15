@@ -105,6 +105,23 @@
 .nh-talk-compose-actions button:disabled{opacity:.52;cursor:default}
 @media(max-width:700px){.nh-talk-grid{grid-template-columns:1fr;grid-template-rows:185px minmax(0,1fr);height:calc(100vh - 245px);min-height:510px}.nh-talk-list-panel{border-right:0;border-bottom:1px solid #dae2df}.nh-talk-top{padding:12px}.nh-talk-thread-head{padding:10px 12px}.nh-talk-messages{padding:10px 12px}.nh-talk-compose{padding:9px}.nh-talk-bubble-wrap{max-width:90%}}
 </style>
+
+<style>
+/*   NestHub separated calendar and messaging dashboard sections*/
+.hub-home-sections{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:15px}
+.hub-home-sections .hub-calendar-home{width:100%;max-width:none;margin:0}
+.hub-home-sections .hub-calendar-actions button:last-child{grid-column:1/-1;min-height:84px}
+.hub-messaging-home{width:100%;padding:18px}
+.hub-messaging-home .monitor-intro h1{font-size:1.32rem;margin:1px 0 14px}
+.hub-messaging-entry{width:100%;min-height:91px;display:flex;align-items:center;gap:14px;padding:16px;border:1px solid rgba(255,255,255,.9);border-radius:14px;background:rgba(255,255,255,.7);text-align:left;color:#263449}
+.hub-messaging-entry:hover{background:rgba(255,255,255,.92)}
+.hub-messaging-icon{font-size:1.6rem;line-height:1;flex-shrink:0}
+.hub-messaging-label{display:flex;flex:1;flex-direction:column;gap:6px}
+.hub-messaging-label strong{font-size:.96rem}
+.hub-messaging-label small{font-size:.77rem;color:#637587;line-height:1.4}
+.hub-messaging-chevron{font-size:1.8rem;color:#6c8b7a}
+@media(max-width:420px){.hub-home-sections{gap:11px}.hub-messaging-home{padding:14px}.hub-messaging-entry{padding:12px;min-height:80px}.hub-messaging-home .monitor-intro h1{font-size:1.16rem}}
+</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
@@ -124,14 +141,24 @@
 </section>
 <section id="homeView" class="hidden">
 <section id="dashboardPage" class="hub-section">
-<div class="monitor hub-calendar-home">
-<div class="monitor-intro"><h1>Calendar Updates</h1></div>
+<div class="hub-home-sections">
+<section class="monitor hub-calendar-home" aria-labelledby="hubCalendarHeading">
+<div class="monitor-intro"><h1 id="hubCalendarHeading">Calendar Updates</h1></div>
 <div class="hub-calendar-actions">
 <button type="button" data-open="roster" data-select-kind="update"><span>🗓️</span><strong>Calendar Update</strong><small>Report changes to your class schedule</small></button>
 <button type="button" data-open="roster" data-select-kind="roster"><span>📋</span><strong>Weekly Roster</strong><small>Send your full or partial class listing</small></button>
 <button type="button" data-open="calendar"><span>📅</span><strong>View Calendar</strong><small>See your current class schedule and availability</small></button>
-<button type="button" data-open="messages"><span>💬</span><strong>Messages</strong><small>Talk with Head Office and your team</small></button>
-</div></div>
+</div>
+</section>
+<section class="monitor hub-messaging-home" aria-labelledby="hubMessagingHeading">
+<div class="monitor-intro"><h1 id="hubMessagingHeading">Messaging</h1></div>
+<button type="button" class="hub-messaging-entry" data-open="messages">
+<span class="hub-messaging-icon" aria-hidden="true">💬</span>
+<span class="hub-messaging-label"><strong>Messages</strong><small>Talk with Head Office and your team</small></span>
+<span class="hub-messaging-chevron" aria-hidden="true">›</span>
+</button>
+</section>
+</div>
 </section>
 <div id="moduleBackBar" class="hidden"><button type="button" id="moduleBack" class="secondary">← Dashboard</button></div>
 <section id="rosterPage" class="hub-section hidden">
