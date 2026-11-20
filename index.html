@@ -146,6 +146,66 @@
 .nh-talk-bubble-wrap:not(.mine){margin-right:auto;align-self:flex-start;align-items:flex-start}
 .nh-talk-bubble-wrap:not(.mine) .nh-talk-bubble{background:#f0f1ef;border-color:#dce3df}
 </style>
+<style>
+/*   NestHub messaging workspace — conversations and action folders*/
+#homeView:has(#messagesPage:not(.hidden)){max-width:1250px}
+.nh-talk{background:#fcfaf6;border:1px solid #deded5;border-radius:17px;box-shadow:0 14px 32px rgba(53,68,61,.08)}
+.nh-talk-top{background:#f9f7f2;padding:17px 21px}
+.nh-talk-kicker{margin:0 0 5px!important;color:#657a68!important;font-size:.64rem!important;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.nh-talk-top h2{font-size:1.22rem;color:#34483d}
+.nh-talk-top p:not(.nh-talk-kicker){font-size:.75rem;color:#6c7972}
+.nh-talk-workspace{display:grid;grid-template-columns:201px minmax(0,1fr);height:min(76vh,745px);min-height:520px}
+.nh-talk-nav{display:flex;flex-direction:column;align-items:stretch;gap:5px;padding:18px 11px;background:#f1f0eb;border-right:1px solid #deded5;min-width:0}
+.nh-talk-nav-heading{font-size:.64rem;font-weight:800;letter-spacing:.08em;color:#77867b;text-transform:uppercase;margin:3px 10px 8px}
+.nh-talk-nav-section{margin-top:23px}
+.nh-talk-folder{display:flex;align-items:center;gap:9px;text-align:left;color:#455a4c;border:1px solid transparent;border-radius:10px;padding:11px 10px;background:transparent;font-size:.77rem;font-weight:700;min-height:40px;white-space:normal}
+.nh-talk-folder>span:first-child{font-size:1rem;width:17px;text-align:center;flex-shrink:0}
+.nh-talk-folder:hover{background:#e8ebe4}
+.nh-talk-folder.active{background:#dfe9dd;border-color:#cad9c8;color:#355741}
+.nh-talk-subfolders{display:flex;flex-direction:column;gap:2px;margin-left:22px}
+.nh-talk-subfolder{font-size:.7rem;font-weight:600;min-height:35px;padding:8px 7px}
+.nh-talk-count{margin-left:auto;border-radius:20px;background:#d4e6d5;color:#355741;font-size:.65rem;padding:2px 7px}
+.nh-talk-content,.nh-talk-conversations-view{min-width:0;min-height:0;height:100%}
+.nh-talk-grid{height:100%;min-height:0;grid-template-columns:minmax(230px,34%) minmax(0,1fr)}
+.nh-talk-list-panel{background:#fcfbf8}
+.nh-talk-search-wrap{padding:2px 10px 9px}
+.nh-talk-search-wrap input{width:100%;padding:10px 11px;border:1px solid #d9e2d8;border-radius:9px;background:#fff;font-size:.76rem;outline:none}
+.nh-talk-search-wrap input:focus{border-color:#87aa92;box-shadow:0 0 0 3px rgba(100,142,109,.12)}
+.nh-talk-thread{background:#fff}
+.nh-talk-thread-head{background:#fffefa}
+.nh-talk-conversation.active{background:#e7f0e5;border-color:#cedfcb}
+.nh-talk-action-view{height:100%;overflow-y:auto;background:#fffefa}
+.nh-talk-action-head{padding:25px 28px 21px;border-bottom:1px solid #e5e7df}
+.nh-talk-action-head h3{font-size:1.17rem;color:#34483d;margin:0 0 7px}
+.nh-talk-action-head p:last-child{font-size:.78rem;color:#687a6d;margin:0;line-height:1.5}
+.nh-talk-action-list{padding:25px 28px}
+.nh-talk-action-empty{margin:0 auto;max-width:410px;padding:35px 24px;border:1px dashed #cad7cc;border-radius:14px;background:#fafbf8;text-align:center}
+.nh-talk-action-empty-icon{font-size:1.7rem;color:#809c88;margin-bottom:10px}
+.nh-talk-action-empty strong{display:block;font-size:.88rem;color:#3d5545;margin-bottom:7px}
+.nh-talk-action-empty p{margin:0;color:#728078;font-size:.76rem;line-height:1.65}
+@media(max-width:800px){
+.nh-talk-workspace{grid-template-columns:165px minmax(0,1fr)}
+.nh-talk-nav{padding:14px 7px}
+.nh-talk-folder{font-size:.72rem;padding:10px 7px;gap:6px}
+.nh-talk-subfolders{margin-left:14px}
+.nh-talk-grid{grid-template-columns:minmax(175px,36%) minmax(0,1fr)}
+}
+@media(max-width:700px){
+.nh-talk-top{padding:12px 13px}
+.nh-talk-workspace{display:flex;flex-direction:column;height:auto;min-height:0}
+.nh-talk-nav{display:flex;flex-direction:row;align-items:stretch;gap:5px;padding:10px 9px;overflow-x:auto;scrollbar-width:thin;border-right:0;border-bottom:1px solid #e0e3da;flex-shrink:0}
+.nh-talk-nav-heading,.nh-talk-subfolders{display:none}
+.nh-talk-folder,.nh-talk-subfolder{font-size:.69rem;padding:10px 12px;white-space:nowrap;min-height:38px;flex-shrink:0}
+.nh-talk-subfolders{display:contents}
+.nh-talk-content{height:calc(100dvh - 255px);min-height:390px}
+.nh-talk-conversations-view{height:100%}
+.nh-talk-grid{height:100%;min-height:0}
+.nh-talk-action-head{padding:18px 17px}
+.nh-talk-action-list{padding:16px 12px}
+.nh-talk-action-empty{padding:25px 18px}
+}
+@media(max-width:390px){.nh-talk-content{height:calc(100dvh - 270px)}.nh-talk-folder{font-size:.64rem;padding:8px 10px}}
+</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
@@ -204,10 +264,25 @@
 
 <section id="messagesPage" class="hub-section hidden">
 <div class="hub-card nh-talk">
-<div class="nh-talk-top"><div><h2>Messages</h2><p>Conversations for your playschool</p></div><button id="nhTalkRefresh" type="button" class="secondary">Refresh</button></div>
+<div class="nh-talk-top"><div><p class="nh-talk-kicker">NestHub · Communications</p><h2>Messages</h2><p>Your playschool's conversations and requests</p></div><button id="nhTalkRefresh" type="button" class="secondary">Refresh</button></div>
+<div class="nh-talk-workspace">
+<nav class="nh-talk-nav" aria-label="Message folders">
+<div class="nh-talk-nav-heading">Messaging</div>
+<button type="button" class="nh-talk-folder active" data-talk-folder="conversations" aria-pressed="true"><span aria-hidden="true">◌</span> Conversations</button>
+<div class="nh-talk-nav-heading nh-talk-nav-section">Requests</div>
+<button type="button" class="nh-talk-folder" data-talk-folder="actions" aria-pressed="false"><span aria-hidden="true">▣</span> Action Required <span id="nhTalkActionCount" class="nh-talk-count hidden">0</span></button>
+<div class="nh-talk-subfolders">
+<button type="button" class="nh-talk-folder nh-talk-subfolder" data-talk-folder="trials" aria-pressed="false">Free Trials &amp; Visits</button>
+<button type="button" class="nh-talk-folder nh-talk-subfolder" data-talk-folder="requests" aria-pressed="false">Other Requests</button>
+</div>
+<button type="button" class="nh-talk-folder" data-talk-folder="completed" aria-pressed="false"><span aria-hidden="true">✓</span> Completed</button>
+</nav>
+<div class="nh-talk-content">
+<div id="nhTalkConversationsView" class="nh-talk-conversations-view">
 <div class="nh-talk-grid">
 <aside class="nh-talk-list-panel">
 <div id="nhTalkListStatus" class="nh-talk-list-header" role="status">Loading conversations…</div>
+<div class="nh-talk-search-wrap"><label class="hidden" for="nhTalkSearch">Search conversations</label><input id="nhTalkSearch" type="search" placeholder="Search conversations…" autocomplete="off"></div>
 <div id="nhTalkConversations" class="nh-talk-list"></div>
 </aside>
 <div class="nh-talk-thread">
@@ -219,6 +294,13 @@
 <textarea id="nhTalkText" placeholder="Select a conversation…" disabled></textarea>
 <div class="nh-talk-compose-actions"><span id="nhTalkHint">Select a conversation first.</span><button id="nhTalkSend" type="submit" class="secondary" disabled>Send</button></div>
 </form>
+</div>
+</div>
+</div>
+<section id="nhTalkActionView" class="nh-talk-action-view hidden" aria-labelledby="nhTalkActionTitle">
+<div class="nh-talk-action-head"><p class="nh-talk-kicker">Franchise requests</p><h3 id="nhTalkActionTitle">Action Required</h3><p id="nhTalkActionDescription">Requests that need a response from your playschool.</p></div>
+<div id="nhTalkActionList" class="nh-talk-action-list" role="status"></div>
+</section>
 </div>
 </div>
 </div>
@@ -409,10 +491,42 @@ $('nhTalkSend').textContent=talkSending?'Sending…':'Send';
 $('nhTalkHint').textContent=talkSending?'Sending…':!talkCurrent?'Select a conversation first.':talkCanSend?'Reply as franchise owner.':'Read only — not a participant.';
 $('nhTalkText').placeholder=enabled?'Write a message…':'Select a conversation…';
 }
+let talkFolder='conversations';
+const talkFolderConfig={
+conversations:{title:'Conversations',description:''},
+actions:{title:'Action Required',description:'Requests from Head Office and connected systems that need a response.'},
+trials:{title:'Free Trials & Visits',description:'Scheduled visits and trials awaiting franchise feedback.'},
+requests:{title:'Other Requests',description:'Other requests sent to your playschool.'},
+completed:{title:'Completed',description:'Requests already answered by your playschool.'}
+};
+function talkRenderActionFolder(){
+const config=talkFolderConfig[talkFolder]||talkFolderConfig.actions;
+$('nhTalkActionTitle').textContent=config.title;
+$('nhTalkActionDescription').textContent=config.description;
+const list=$('nhTalkActionList');list.replaceChildren();
+const box=talkEl('div','nh-talk-action-empty','');
+box.append(talkEl('div','nh-talk-action-empty-icon',talkFolder==='completed'?'✓':'▣'));
+box.append(talkEl('strong','',talkFolder==='completed'?'No completed requests yet':'No requests to display yet'));
+box.append(talkEl('p','',talkFolder==='completed'?'Completed franchise responses will appear here once action notifications are connected.':'This folder is ready for structured notifications from Ads Journey. Free-trial and visit requests will appear here when their connection is enabled.'));
+list.append(box);
+}
+function talkSetFolder(folder){
+if(!talkFolderConfig[folder])return;
+talkFolder=folder;
+document.querySelectorAll('[data-talk-folder]').forEach(button=>{const active=button.dataset.talkFolder===folder;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});
+const isConversation=folder==='conversations';
+$('nhTalkConversationsView').classList.toggle('hidden',!isConversation);
+$('nhTalkActionView').classList.toggle('hidden',isConversation);
+if(!isConversation)talkRenderActionFolder();
+}
+document.querySelectorAll('[data-talk-folder]').forEach(button=>button.addEventListener('click',()=>talkSetFolder(button.dataset.talkFolder)));
+$('nhTalkSearch').addEventListener('input',talkRenderList);
 function talkRenderList(){
 const list=$('nhTalkConversations');list.replaceChildren();
 if(!talkConversations.length){list.append(talkEl('p','nh-talk-empty','No branch conversations yet.'));return}
-for(const row of talkConversations){
+const term=$('nhTalkSearch').value.trim().toLowerCase();
+if(term&&!talkConversations.some(row=>[talkName(row),row.franchise_id,row.conversation_type,row.id].join(' ').toLowerCase().includes(term))){list.append(talkEl('p','nh-talk-empty','No conversations match your search.'));return}
+for(const row of talkConversations.filter(row=>{const term=$('nhTalkSearch').value.trim().toLowerCase();return !term||[talkName(row),row.franchise_id,row.conversation_type,row.id].join(' ').toLowerCase().includes(term)})){
 const btn=talkEl('button','nh-talk-conversation'+(String(talkCurrent)===String(row.id)?' active':''),'');btn.type='button';
 const head=talkEl('div','nh-talk-item-top','');
 head.append(talkEl('strong','',talkName(row)),talkEl('span','',talkDate(row.last_message_at||row.updated_at)));
@@ -501,6 +615,7 @@ await loadHubMessages();
 finally{talkSending=false;talkComposer()}
 });
 
+talkSetFolder('conversations');
 if(readNestHubSession())showHome();
 button.disabled=!LOGIN_ENDPOINT;
 if(LOGIN_ENDPOINT)message.textContent='';
