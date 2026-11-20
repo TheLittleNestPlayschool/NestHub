@@ -206,6 +206,28 @@
 }
 @media(max-width:390px){.nh-talk-content{height:calc(100dvh - 270px)}.nh-talk-folder{font-size:.64rem;padding:8px 10px}}
 </style>
+<style>
+/*   NestHub actionable messages — live franchise requests*/
+.nh-talk-action-list{display:flex;flex-direction:column;gap:12px;align-items:stretch}
+.nh-talk-action-card{background:#fff;border:1px solid #dfe5dc;border-radius:13px;padding:17px 19px;box-shadow:0 3px 10px rgba(59,76,63,.035)}
+.nh-talk-action-card-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.nh-talk-action-type{font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#6b7e71}
+.nh-talk-action-status{font-size:.68rem;font-weight:700;color:#4e6657;border:1px solid #d7e3d6;border-radius:999px;background:#eef3ed;padding:5px 9px;white-space:nowrap}
+.nh-talk-action-status.awaiting_feedback{background:#f9f1df;color:#8a6523;border-color:#ead9af}
+.nh-talk-action-status.completed{background:#e7f1e7;color:#355f41}
+.nh-talk-action-status.submitted{background:#e9eff8;color:#4a6283;border-color:#d7e2f2}
+.nh-talk-action-status.cancelled{background:#f1f0ef;color:#79746d;border-color:#e1dedb}
+.nh-talk-action-card h4{font-size:.95rem;color:#2e4437;margin:0 0 13px;line-height:1.35}
+.nh-talk-action-detail{display:grid;grid-template-columns:105px minmax(0,1fr);gap:12px;margin-top:8px;font-size:.78rem;align-items:start}
+.nh-talk-action-detail>span{color:#718076}
+.nh-talk-action-detail>strong{font-weight:600;color:#374a3d;overflow-wrap:anywhere}
+.nh-talk-action-description{font-size:.73rem;color:#667a6c;line-height:1.5;margin:14px 0 0}
+.nh-talk-action-outcome{font-size:.73rem;color:#425d4a;line-height:1.5;margin-top:6px;overflow-wrap:anywhere}
+.nh-talk-action-card-footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid #edf0eb;margin-top:14px;padding-top:11px;font-size:.67rem;color:#7c8980;text-transform:capitalize}
+.nh-talk-action-feedback{margin:8px 0;padding:18px;border-radius:10px;background:#f4f7f3;color:#687e6b;font-size:.79rem}
+.nh-talk-action-feedback.error{color:#9b443c;background:#fcf2f0}
+@media(max-width:700px){.nh-talk-action-card{padding:14px}.nh-talk-action-detail{grid-template-columns:85px minmax(0,1fr);gap:8px}.nh-talk-action-card-footer{font-size:.64rem}}
+</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
@@ -400,7 +422,7 @@ $('rosterPage').classList.toggle('hidden',page!=='roster');
 $('calendarPage').classList.toggle('hidden',page!=='calendar');
 $('messagesPage').classList.toggle('hidden',page!=='messages');
 if(page==='calendar')loadCalendar();
-if(page==='messages')loadHubMessages();
+if(page==='messages'){loadHubMessages();loadHubActionRequests()}
 $('placeholderPage').classList.toggle('hidden',primary.includes(page));
 $('moduleBackBar').classList.toggle('hidden',page==='dashboard');
 $('hubSignOutFooter').classList.toggle('hidden',page!=='dashboard');
@@ -433,7 +455,7 @@ try{const res=await fetch(ROSTER_ENDPOINT,{method:'POST',headers:{'Content-Type'
 catch(error){showSubmitPopup('Unable to submit',error instanceof Error?error.message:'Unable to save submission.','!',true)}
 finally{submitting=false;$('hubSubmit').disabled=!$('hubText').value.trim()}
 });
-$('signOut').addEventListener('click',()=>{contextRequest++;calendarRequest++;calendarData=null;hubOwnerId=0;talkCurrent=null;talkCanSend=false;talkConversations=[];talkMessageSeq++;talkLoadSeq++;$('messagesPage').querySelector('.nh-talk-grid').classList.remove('has-active');clearNestHubSession();resetHubHeader();showLogin()});
+$('signOut').addEventListener('click',()=>{contextRequest++;calendarRequest++;calendarData=null;hubOwnerId=0;talkCurrent=null;talkCanSend=false;talkConversations=[];talkMessageSeq++;talkLoadSeq++;talkActionSeq++;talkActionRequests=[];talkActionLoading=false;talkActionError='';$('messagesPage').querySelector('.nh-talk-grid').classList.remove('has-active');clearNestHubSession();resetHubHeader();showLogin()});
 
 /*   NestHub messaging — franchise oversight and participant replies*/
 const TALK_API='https://x58r-xped-p4y6.n7e.xano.io/api:o_oYSIFY/';
@@ -499,16 +521,85 @@ trials:{title:'Free Trials & Visits',description:'Scheduled visits and trials aw
 requests:{title:'Other Requests',description:'Other requests sent to your playschool.'},
 completed:{title:'Completed',description:'Requests already answered by your playschool.'}
 };
+let talkActionRequests=[],talkActionLoading=false,talkActionError='',talkActionSeq=0;
+const talkActiveStatuses=new Set(['scheduled','awaiting_feedback']);
+function talkActionIsTrial(row){return /^(free_trial|visit)(_|$)/.test(String(row.request_type||''))}
+function talkActionStatusLabel(status){return ({scheduled:'Scheduled',awaiting_feedback:'Feedback needed',submitted:'Response submitted',completed:'Completed',cancelled:'Cancelled'})[status]||status||'Unknown'}
+function talkActionDate(stamp){
+const n=Number(stamp);if(!Number.isFinite(n)||n<=0)return '';
+return new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',weekday:'short',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(n));
+}
+function talkActionRows(){
+return talkActionRequests.filter(row=>{
+const status=String(row.status||'').toLowerCase();
+const active=talkActiveStatuses.has(status);
+if(talkFolder==='actions')return active;
+if(talkFolder==='trials')return active&&talkActionIsTrial(row);
+if(talkFolder==='requests')return active&&!talkActionIsTrial(row);
+if(talkFolder==='completed')return ['submitted','completed','cancelled'].includes(status);
+return false;
+});
+}
 function talkRenderActionFolder(){
 const config=talkFolderConfig[talkFolder]||talkFolderConfig.actions;
 $('nhTalkActionTitle').textContent=config.title;
 $('nhTalkActionDescription').textContent=config.description;
 const list=$('nhTalkActionList');list.replaceChildren();
+if(talkActionLoading){list.append(talkEl('p','nh-talk-action-feedback','Loading franchise requests…'));return}
+if(talkActionError){const warning=talkEl('p','nh-talk-action-feedback error','Unable to load requests: '+talkActionError);list.append(warning);return}
+const rows=talkActionRows();
+if(!rows.length){
 const box=talkEl('div','nh-talk-action-empty','');
 box.append(talkEl('div','nh-talk-action-empty-icon',talkFolder==='completed'?'✓':'▣'));
-box.append(talkEl('strong','',talkFolder==='completed'?'No completed requests yet':'No requests to display yet'));
-box.append(talkEl('p','',talkFolder==='completed'?'Completed franchise responses will appear here once action notifications are connected.':'This folder is ready for structured notifications from Ads Journey. Free-trial and visit requests will appear here when their connection is enabled.'));
-list.append(box);
+box.append(talkEl('strong','',talkFolder==='completed'?'No submitted or completed requests':'No requests in this folder'));
+box.append(talkEl('p','',talkFolder==='completed'?'Requests will appear here after their responses are submitted or processed.':'Requests assigned to your franchise will appear here automatically.'));
+list.append(box);return;
+}
+for(const row of rows){
+const status=String(row.status||'').toLowerCase();
+const data=row.request_data&&typeof row.request_data==='object'&&!Array.isArray(row.request_data)?row.request_data:{};
+const card=talkEl('article','nh-talk-action-card','');
+const top=talkEl('div','nh-talk-action-card-top','');
+const type=talkActionIsTrial(row)?(/visit/.test(String(row.request_type))?'Visit':'Free Trial'):'Franchise Request';
+top.append(talkEl('span','nh-talk-action-type',type),talkEl('span','nh-talk-action-status '+status.replace(/[^a-z_]/g,''),talkActionStatusLabel(status)));
+card.append(top,talkEl('h4','',String(row.title||'Request #'+row.id)));
+const fields=[
+['Child',data.child_name||data.student_name],
+['Parent',data.parent_name||data.parent_full_name],
+['Appointment',talkActionDate(row.scheduled_at)],
+['Response due',talkActionDate(row.due_at)]
+];
+for(const [label,value] of fields){if(value===null||value===undefined||String(value).trim()==='')continue;const line=talkEl('div','nh-talk-action-detail','');line.append(talkEl('span','',label),talkEl('strong','',value));card.append(line)}
+card.append(talkEl('p','nh-talk-action-description',status==='scheduled'?'Booking received. Awaiting the scheduled appointment.':status==='awaiting_feedback'?'Franchise feedback is needed. The response form will be connected next.':status==='submitted'?'The response has been sent for Head Office processing.':status==='completed'?'Head Office has processed this response.':status==='cancelled'?'This request was cancelled.':''));
+if(status==='submitted'||status==='completed'){
+if(row.response_outcome)card.append(talkEl('div','nh-talk-action-outcome','Outcome: '+String(row.response_outcome)));
+if(row.response_notes)card.append(talkEl('div','nh-talk-action-outcome','Notes: '+String(row.response_notes)));
+}
+const footer=talkEl('div','nh-talk-action-card-footer','');
+footer.append(talkEl('span','',String(row.source_app||'Head Office').replace(/_/g,' ')+' · Request #'+row.id));
+if(talkActiveStatuses.has(status))footer.append(talkEl('span','',status==='scheduled'?'Outcome form coming next':'Response form coming next'));
+card.append(footer);list.append(card);
+}
+}
+async function loadHubActionRequests(){
+const seq=++talkActionSeq;
+talkActionLoading=true;talkActionError='';
+if(talkFolder!=='conversations')talkRenderActionFolder();
+try{
+const response=await talkRequest('comm_franchise_action_request_list');
+if(seq!==talkActionSeq)return;
+talkActionRequests=talkList(response,['action_requests','requests','items','results']);
+talkActionRequests.sort((a,b)=>Number(b.scheduled_at||b.created_at||0)-Number(a.scheduled_at||a.created_at||0));
+}catch(error){if(seq!==talkActionSeq)return;talkActionError=error?.message||'Connection unavailable';talkActionRequests=[]}
+finally{
+if(seq===talkActionSeq){
+talkActionLoading=false;
+const count=talkActionRequests.filter(row=>talkActiveStatuses.has(String(row.status||'').toLowerCase())).length;
+$('nhTalkActionCount').textContent=String(count);
+$('nhTalkActionCount').classList.toggle('hidden',count===0);
+if(talkFolder!=='conversations')talkRenderActionFolder();
+}
+}
 }
 function talkSetFolder(folder){
 if(!talkFolderConfig[folder])return;
@@ -598,7 +689,7 @@ if(!ownerId){$('nhTalkStatus').textContent='Unable to identify this owner accoun
 talkComposer();
 }
 $('nhTalkBack').addEventListener('click',()=>{$('messagesPage').querySelector('.nh-talk-grid').classList.remove('has-active')});
-$('nhTalkRefresh').addEventListener('click',loadHubMessages);
+$('nhTalkRefresh').addEventListener('click',()=>{loadHubMessages();loadHubActionRequests()});
 $('nhTalkText').addEventListener('input',talkComposer);
 $('nhTalkForm').addEventListener('submit',async event=>{
 event.preventDefault();
