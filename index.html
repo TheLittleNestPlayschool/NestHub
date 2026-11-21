@@ -240,6 +240,9 @@
 .nh-talk-outcome-head h2{font-size:1.1rem;color:#354b3d;margin:0}
 .nh-talk-outcome-close{border:0;background:transparent;font-size:1.6rem;line-height:1;color:#627568;padding:0 3px}
 .nh-talk-outcome-details{padding:11px 12px;margin:17px 0 15px;border:1px solid #e0e8df;background:#f4f7f1;border-radius:10px;font-size:.78rem;line-height:1.5;color:#55695a}
+.nh-talk-outcome-detail{display:grid;grid-template-columns:88px minmax(0,1fr);align-items:start;gap:10px;padding:4px 0}
+.nh-talk-outcome-detail span{color:#74877a}
+.nh-talk-outcome-detail strong{font-weight:700;color:#405747;overflow-wrap:anywhere}
 #nhTalkOutcomeForm label{font-size:.78rem;color:#465b4c;margin:14px 0 7px}
 #nhTalkOutcomeForm select,#nhTalkOutcomeForm textarea{display:block;width:100%;padding:11px 12px;font:inherit;font-size:.83rem;line-height:1.5;color:#34483a;background:#fff;border:1px solid #cbd9cd;border-radius:9px;outline:none}
 #nhTalkOutcomeForm select:focus,#nhTalkOutcomeForm textarea:focus{border-color:#749a7b;box-shadow:0 0 0 3px rgba(88,137,92,.12)}
@@ -364,7 +367,7 @@
 <div id="nhTalkOutcomeModal" class="nh-talk-outcome-overlay hidden" role="presentation">
 <section class="nh-talk-outcome-dialog" role="dialog" aria-modal="true" aria-labelledby="nhTalkOutcomeTitle" aria-describedby="nhTalkOutcomeDetails">
 <div class="nh-talk-outcome-head"><div><p class="nh-talk-kicker">Franchise Feedback</p><h2 id="nhTalkOutcomeTitle">Submit trial outcome</h2></div><button id="nhTalkOutcomeClose" class="nh-talk-outcome-close" type="button" aria-label="Close feedback form">×</button></div>
-<p id="nhTalkOutcomeDetails" class="nh-talk-outcome-details"></p>
+<div id="nhTalkOutcomeDetails" class="nh-talk-outcome-details"></div>
 <form id="nhTalkOutcomeForm">
 <label for="nhTalkOutcomeSelect">How did the appointment go?</label>
 <select id="nhTalkOutcomeSelect" required>
@@ -777,8 +780,14 @@ if(!talkActionIsTrial(row))return;
 talkOutcomeId=Number(row.id);
 const data=row.request_data&&typeof row.request_data==='object'?row.request_data:{};
 $('nhTalkOutcomeTitle').textContent=/visit/.test(String(row.request_type))?'Submit visit outcome':'Submit free-trial outcome';
-const label=String(data.child_name||data.student_name||row.title||'Appointment');
-$('nhTalkOutcomeDetails').textContent=label+(Number(row.scheduled_at)>0?' · '+talkActionDate(row.scheduled_at):'');
+const child=String(data.child_name||data.student_name||'').trim();
+const parent=String(data.parent_name||data.parent_full_name||data.guardian_name||'').trim();
+const details=$('nhTalkOutcomeDetails');details.replaceChildren();
+for(const [label,value] of [['Child',child||'Not provided'],['Parent',parent||'Not provided'],['Appointment',talkActionDate(row.scheduled_at)||'Not scheduled']]){
+const line=talkEl('div','nh-talk-outcome-detail','');
+line.append(talkEl('span','',label),talkEl('strong','',value));
+details.append(line);
+}
 $('nhTalkOutcomeSelect').value='';
 $('nhTalkOutcomeNotes').value='';
 $('nhTalkOutcomeError').classList.add('hidden');
