@@ -652,7 +652,7 @@ const card=talkEl('article','nh-talk-action-card nh-talk-action-mini','');
 const type=talkActionIsTrial(row)?(/visit/.test(String(row.request_type))?'Visit':'Free Trial'):'Request';
 const heading=talkEl('div','nh-talk-action-mini-content','');
 const top=talkEl('div','nh-talk-action-card-top','');
-top.append(talkEl('span','nh-talk-action-type',type),talkEl('span','nh-talk-action-status '+status.replace(/[^a-z_]/g,''),talkActionStatusLabel(status)));
+top.append(talkEl('span','nh-talk-action-type',type),talkEl('span','nh-talk-action-status '+status.replace(/[^a-z_]/g,''),data.rescheduled&&status==='scheduled'?'Rescheduled':talkActionStatusLabel(status)));
 heading.append(top);
 const info=talkEl('div','nh-talk-action-mini-info','');
 info.append(talkEl('strong','nh-talk-action-mini-name',String(data.child_name||data.student_name||row.title||'Request #'+row.id)));
@@ -682,10 +682,11 @@ const fields=[
 ['Child',data.child_name||data.student_name],
 ['Parent',data.parent_name||data.parent_full_name],
 ['Appointment',talkActionDate(row.scheduled_at)],
-['Response due',talkActionDate(row.due_at)]
+['Response due',talkActionDate(row.due_at)],
+['Previous appointment',data.rescheduled?talkActionDate(data.previous_scheduled_at):'']
 ];
 for(const [label,value] of fields){if(value===null||value===undefined||String(value).trim()==='')continue;const line=talkEl('div','nh-talk-action-detail','');line.append(talkEl('span','',label),talkEl('strong','',value));detailBox.append(line)}
-const description=status==='scheduled'?'Awaiting the scheduled appointment. The assigned Main account can submit the outcome after the appointment begins.':status==='awaiting_feedback'?'Franchise feedback is needed.':status==='submitted'?'Feedback submitted for Head Office processing.':status==='completed'?'Head Office has processed the response.':status==='cancelled'?'This request was cancelled.':'';
+const description=status==='scheduled'?(data.rescheduled?'The appointment has been moved. This is the updated schedule. Feedback is available after the new appointment begins.':'Awaiting the scheduled appointment. The assigned Main account can submit the outcome after the appointment begins.'):status==='awaiting_feedback'?'Franchise feedback is needed.':status==='submitted'?'Feedback submitted for Head Office processing.':status==='completed'?'Head Office has processed the response.':status==='cancelled'?'This request was cancelled.':'';
 if(description)detailBox.append(talkEl('p','nh-talk-action-description',description));
 if(row.response_outcome)detailBox.append(talkEl('div','nh-talk-action-outcome','Outcome: '+String(row.response_outcome).replace(/_/g,' ')));
 if(row.response_notes)detailBox.append(talkEl('div','nh-talk-action-outcome','Notes: '+String(row.response_notes)));
