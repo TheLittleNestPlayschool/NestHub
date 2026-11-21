@@ -255,6 +255,43 @@
 .nh-talk-outcome-primary:disabled,.nh-talk-outcome-actions .secondary:disabled,.nh-talk-outcome-close:disabled{opacity:.58;cursor:default}
 @media(max-width:540px){.nh-talk-outcome-overlay{padding:12px}.nh-talk-outcome-dialog{padding:18px}.nh-talk-outcome-actions button{flex:1}}
 </style>
+<style>
+/*   NestHub compact mobile-friendly action cards*/
+.nh-talk-action-list{gap:7px}
+.nh-talk-action-card.nh-talk-action-mini{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:11px;row-gap:0;padding:10px 12px;border-radius:10px;box-shadow:none}
+.nh-talk-action-mini-content{min-width:0;grid-column:1}
+.nh-talk-action-mini .nh-talk-action-card-top{justify-content:flex-start;gap:8px;min-width:0;margin:0 0 4px}
+.nh-talk-action-mini .nh-talk-action-type{font-size:.59rem}
+.nh-talk-action-mini .nh-talk-action-status{padding:2px 7px;font-size:.6rem;font-weight:700}
+.nh-talk-action-mini-info{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;min-width:0}
+.nh-talk-action-mini-name{font-size:.82rem;line-height:1.25;color:#2e4437;overflow-wrap:anywhere;min-width:0}
+.nh-talk-action-mini-date{font-size:.67rem;color:#66796b;white-space:nowrap}
+.nh-talk-action-mini-outcome{margin-top:3px;font-size:.66rem;color:#6f8174;text-transform:capitalize}
+.nh-talk-action-mini-controls{grid-column:2;align-self:center}
+.nh-talk-action-mini .nh-talk-action-submit{padding:8px 10px;font-size:.69rem;white-space:nowrap}
+.nh-talk-action-mini-extra{grid-column:1/-1;min-width:0;font-size:.7rem;color:#637869;margin-top:4px}
+.nh-talk-action-mini-extra summary{display:inline-block;list-style:none;cursor:pointer;color:#4f7159;font-weight:700;font-size:.65rem;padding:5px 0 0;text-decoration:underline;text-decoration-color:#b9cbbd;text-underline-offset:3px}
+.nh-talk-action-mini-extra summary::-webkit-details-marker{display:none}
+.nh-talk-action-mini-extra summary:focus-visible{outline:2px solid #87aa92;outline-offset:3px}
+.nh-talk-action-mini-detailbox{border-top:1px solid #edf0eb;margin-top:9px;padding-top:9px}
+.nh-talk-action-mini .nh-talk-action-detail{grid-template-columns:88px minmax(0,1fr);gap:7px;font-size:.7rem;margin-top:5px}
+.nh-talk-action-mini .nh-talk-action-description{font-size:.69rem;margin:9px 0 0}
+.nh-talk-action-mini .nh-talk-action-outcome{font-size:.7rem;margin-top:5px}
+.nh-talk-action-mini .nh-talk-action-card-footer{margin-top:9px;padding-top:7px;font-size:.64rem}
+@media(max-width:700px){
+.nh-talk-action-list{gap:6px}
+.nh-talk-action-list .nh-talk-action-mini{padding:9px 10px;column-gap:8px}
+.nh-talk-action-mini-info{gap:4px 9px}
+.nh-talk-action-mini-name{font-size:.8rem}
+.nh-talk-action-mini-date{font-size:.65rem}
+.nh-talk-action-mini .nh-talk-action-submit{padding:8px;font-size:.66rem}
+}
+@media(max-width:390px){
+.nh-talk-action-mini .nh-talk-action-status{font-size:.57rem}
+.nh-talk-action-mini-name{font-size:.76rem}
+.nh-talk-action-mini-date{font-size:.62rem}
+}
+</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
@@ -589,13 +626,17 @@ if(talkFolder==='completed')return ['submitted','completed','cancelled'].include
 return false;
 });
 }
+function talkActionShortDate(stamp){
+const n=Number(stamp);if(!Number.isFinite(n)||n<=0)return '';
+return new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(n));
+}
 function talkRenderActionFolder(){
 const config=talkFolderConfig[talkFolder]||talkFolderConfig.actions;
 $('nhTalkActionTitle').textContent=config.title;
 $('nhTalkActionDescription').textContent=config.description;
 const list=$('nhTalkActionList');list.replaceChildren();
 if(talkActionLoading){list.append(talkEl('p','nh-talk-action-feedback','Loading franchise requests…'));return}
-if(talkActionError){const warning=talkEl('p','nh-talk-action-feedback error','Unable to load requests: '+talkActionError);list.append(warning);return}
+if(talkActionError){list.append(talkEl('p','nh-talk-action-feedback error','Unable to load requests: '+talkActionError));return}
 const rows=talkActionRows();
 if(!rows.length){
 const box=talkEl('div','nh-talk-action-empty','');
@@ -607,25 +648,20 @@ list.append(box);return;
 for(const row of rows){
 const status=String(row.status||'').toLowerCase();
 const data=row.request_data&&typeof row.request_data==='object'&&!Array.isArray(row.request_data)?row.request_data:{};
-const card=talkEl('article','nh-talk-action-card','');
+const card=talkEl('article','nh-talk-action-card nh-talk-action-mini','');
+const type=talkActionIsTrial(row)?(/visit/.test(String(row.request_type))?'Visit':'Free Trial'):'Request';
+const heading=talkEl('div','nh-talk-action-mini-content','');
 const top=talkEl('div','nh-talk-action-card-top','');
-const type=talkActionIsTrial(row)?(/visit/.test(String(row.request_type))?'Visit':'Free Trial'):'Franchise Request';
 top.append(talkEl('span','nh-talk-action-type',type),talkEl('span','nh-talk-action-status '+status.replace(/[^a-z_]/g,''),talkActionStatusLabel(status)));
-card.append(top,talkEl('h4','',String(row.title||'Request #'+row.id)));
-const fields=[
-['Child',data.child_name||data.student_name],
-['Parent',data.parent_name||data.parent_full_name],
-['Appointment',talkActionDate(row.scheduled_at)],
-['Response due',talkActionDate(row.due_at)]
-];
-for(const [label,value] of fields){if(value===null||value===undefined||String(value).trim()==='')continue;const line=talkEl('div','nh-talk-action-detail','');line.append(talkEl('span','',label),talkEl('strong','',value));card.append(line)}
-card.append(talkEl('p','nh-talk-action-description',status==='scheduled'?'Booking received. The assigned Main account can report an outcome after the appointment begins.':status==='awaiting_feedback'?'Franchise feedback is needed.':status==='submitted'?'The response has been sent for Head Office processing.':status==='completed'?'Head Office has processed this response.':status==='cancelled'?'This request was cancelled.':''));
-if(status==='submitted'||status==='completed'){
-if(row.response_outcome)card.append(talkEl('div','nh-talk-action-outcome','Outcome: '+String(row.response_outcome)));
-if(row.response_notes)card.append(talkEl('div','nh-talk-action-outcome','Notes: '+String(row.response_notes)));
-}
-const footer=talkEl('div','nh-talk-action-card-footer','');
-footer.append(talkEl('span','',String(row.source_app||'Head Office').replace(/_/g,' ')+' · Request #'+row.id));
+heading.append(top);
+const info=talkEl('div','nh-talk-action-mini-info','');
+info.append(talkEl('strong','nh-talk-action-mini-name',String(data.child_name||data.student_name||row.title||'Request #'+row.id)));
+const time=talkActionShortDate(row.scheduled_at);
+if(time)info.append(talkEl('span','nh-talk-action-mini-date',time));
+heading.append(info);
+if(['submitted','completed','cancelled'].includes(status)&&row.response_outcome)heading.append(talkEl('div','nh-talk-action-mini-outcome','Outcome: '+String(row.response_outcome).replace(/_/g,' ')));
+card.append(heading);
+const controls=talkEl('div','nh-talk-action-mini-controls','');
 if(talkActiveStatuses.has(status)){
 const recipient=Number(row.recipient_user_id)||0;
 const isAssigned=recipient>0&&recipient===Number(talkActionUserId);
@@ -634,13 +670,35 @@ const canRespond=status==='awaiting_feedback'||(scheduled>0&&Date.now()>=schedul
 if(isAssigned&&canRespond&&talkActionIsTrial(row)){
 const submit=talkEl('button','nh-talk-action-submit','Submit outcome');submit.type='button';
 submit.addEventListener('click',()=>talkOpenOutcome(row));
-footer.append(submit);
-}else{
-const reason=!isAssigned?'Main account oversight — only the assigned account can respond':!canRespond?'Available after the scheduled appointment':'View only';
-footer.append(talkEl('span','nh-talk-action-wait',reason));
+controls.append(submit);
 }
 }
-card.append(footer);list.append(card);
+if(controls.childElementCount)card.append(controls);
+const extra=document.createElement('details');extra.className='nh-talk-action-mini-extra';
+const expander=document.createElement('summary');expander.textContent='Details';extra.append(expander);
+const detailBox=talkEl('div','nh-talk-action-mini-detailbox','');
+const fields=[
+['Request',row.title||'Request #'+row.id],
+['Child',data.child_name||data.student_name],
+['Parent',data.parent_name||data.parent_full_name],
+['Appointment',talkActionDate(row.scheduled_at)],
+['Response due',talkActionDate(row.due_at)]
+];
+for(const [label,value] of fields){if(value===null||value===undefined||String(value).trim()==='')continue;const line=talkEl('div','nh-talk-action-detail','');line.append(talkEl('span','',label),talkEl('strong','',value));detailBox.append(line)}
+const description=status==='scheduled'?'Awaiting the scheduled appointment. The assigned Main account can submit the outcome after the appointment begins.':status==='awaiting_feedback'?'Franchise feedback is needed.':status==='submitted'?'Feedback submitted for Head Office processing.':status==='completed'?'Head Office has processed the response.':status==='cancelled'?'This request was cancelled.':'';
+if(description)detailBox.append(talkEl('p','nh-talk-action-description',description));
+if(row.response_outcome)detailBox.append(talkEl('div','nh-talk-action-outcome','Outcome: '+String(row.response_outcome).replace(/_/g,' ')));
+if(row.response_notes)detailBox.append(talkEl('div','nh-talk-action-outcome','Notes: '+String(row.response_notes)));
+const footer=talkEl('div','nh-talk-action-card-footer','');
+footer.append(talkEl('span','',String(row.source_app||'Head Office').replace(/_/g,' ')+' · Request #'+row.id));
+if(talkActiveStatuses.has(status)){
+const recipient=Number(row.recipient_user_id)||0;
+const isAssigned=recipient>0&&recipient===Number(talkActionUserId);
+const scheduled=Number(row.scheduled_at)||0;
+if(!isAssigned)footer.append(talkEl('span','nh-talk-action-wait','Main account submits outcomes'));
+else if(status==='scheduled'&&(!scheduled||Date.now()<scheduled))footer.append(talkEl('span','nh-talk-action-wait','Available after appointment'));
+}
+detailBox.append(footer);extra.append(detailBox);card.append(extra);list.append(card);
 }
 }
 async function loadHubActionRequests(){
