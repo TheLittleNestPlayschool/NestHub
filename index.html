@@ -228,6 +228,30 @@
 .nh-talk-action-feedback.error{color:#9b443c;background:#fcf2f0}
 @media(max-width:700px){.nh-talk-action-card{padding:14px}.nh-talk-action-detail{grid-template-columns:85px minmax(0,1fr);gap:8px}.nh-talk-action-card-footer{font-size:.64rem}}
 </style>
+<style>
+/*   NestHub franchise feedback form*/
+.nh-talk-action-submit{background:#52765e;color:#fff;border:1px solid #52765e;border-radius:9px;padding:10px 13px;font-weight:800;font-size:.73rem;cursor:pointer}
+.nh-talk-action-submit:hover{background:#42674e}
+.nh-talk-action-submit:focus-visible{outline:3px solid #97bda1;outline-offset:2px}
+.nh-talk-action-wait{font-size:.7rem;color:#819083}
+.nh-talk-outcome-overlay{position:fixed;inset:0;z-index:11000;display:flex;justify-content:center;align-items:center;padding:16px;background:rgba(29,43,38,.45);backdrop-filter:blur(4px)}
+.nh-talk-outcome-dialog{width:min(460px,100%);max-height:min(92dvh,750px);overflow-y:auto;padding:23px 25px;border-radius:17px;border:1px solid #dbe4da;background:#fffcf8;box-shadow:0 25px 65px rgba(21,37,27,.25)}
+.nh-talk-outcome-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.nh-talk-outcome-head h2{font-size:1.1rem;color:#354b3d;margin:0}
+.nh-talk-outcome-close{border:0;background:transparent;font-size:1.6rem;line-height:1;color:#627568;padding:0 3px}
+.nh-talk-outcome-details{padding:11px 12px;margin:17px 0 15px;border:1px solid #e0e8df;background:#f4f7f1;border-radius:10px;font-size:.78rem;line-height:1.5;color:#55695a}
+#nhTalkOutcomeForm label{font-size:.78rem;color:#465b4c;margin:14px 0 7px}
+#nhTalkOutcomeForm select,#nhTalkOutcomeForm textarea{display:block;width:100%;padding:11px 12px;font:inherit;font-size:.83rem;line-height:1.5;color:#34483a;background:#fff;border:1px solid #cbd9cd;border-radius:9px;outline:none}
+#nhTalkOutcomeForm select:focus,#nhTalkOutcomeForm textarea:focus{border-color:#749a7b;box-shadow:0 0 0 3px rgba(88,137,92,.12)}
+#nhTalkOutcomeForm textarea{min-height:95px;max-height:200px;resize:vertical}
+.nh-talk-optional{color:#829086;font-weight:400}
+.nh-talk-outcome-error{margin:12px 0 0;font-size:.77rem;line-height:1.4;color:#a23b32}
+.nh-talk-outcome-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.nh-talk-outcome-actions .secondary{padding:10px 16px;border-radius:9px;font-size:.78rem}
+.nh-talk-outcome-primary{background:#52765e;color:white;padding:10px 18px;border:1px solid #52765e;border-radius:9px;font-size:.78rem;font-weight:800}
+.nh-talk-outcome-primary:disabled,.nh-talk-outcome-actions .secondary:disabled,.nh-talk-outcome-close:disabled{opacity:.58;cursor:default}
+@media(max-width:540px){.nh-talk-outcome-overlay{padding:12px}.nh-talk-outcome-dialog{padding:18px}.nh-talk-outcome-actions button{flex:1}}
+</style>
 </head>
 <body>
 <div class="app-background" aria-hidden="true"><div class="cloud-blob top-left"></div><div class="cloud-blob top-right"></div><div class="gradient-overlay"></div></div>
@@ -337,6 +361,28 @@
 </section>
 </main></div>
 <div id="hubSubmissionPopup" class="hub-popup hidden" role="dialog" aria-modal="true" aria-labelledby="hubPopupTitle"><div class="hub-popup-card"><div id="hubPopupIcon" class="hub-popup-icon">⏳</div><h2 id="hubPopupTitle">Submitting…</h2><p id="hubPopupText">Saving your submission.</p><button type="button" id="hubPopupOk" class="primary" hidden>OK</button></div></div>
+<div id="nhTalkOutcomeModal" class="nh-talk-outcome-overlay hidden" role="presentation">
+<section class="nh-talk-outcome-dialog" role="dialog" aria-modal="true" aria-labelledby="nhTalkOutcomeTitle" aria-describedby="nhTalkOutcomeDetails">
+<div class="nh-talk-outcome-head"><div><p class="nh-talk-kicker">Franchise Feedback</p><h2 id="nhTalkOutcomeTitle">Submit trial outcome</h2></div><button id="nhTalkOutcomeClose" class="nh-talk-outcome-close" type="button" aria-label="Close feedback form">×</button></div>
+<p id="nhTalkOutcomeDetails" class="nh-talk-outcome-details"></p>
+<form id="nhTalkOutcomeForm">
+<label for="nhTalkOutcomeSelect">How did the appointment go?</label>
+<select id="nhTalkOutcomeSelect" required>
+<option value="">Select an outcome…</option>
+<option value="enrolled">Parent enrolled</option>
+<option value="interested">Parent liked it — still deciding</option>
+<option value="no_show">Parent did not attend</option>
+<option value="reschedule">Appointment needs to be rescheduled</option>
+<option value="not_interested">Parent is not interested</option>
+<option value="cancelled">Appointment was cancelled</option>
+</select>
+<label for="nhTalkOutcomeNotes">Notes for Head Office <span class="nh-talk-optional">(optional)</span></label>
+<textarea id="nhTalkOutcomeNotes" rows="3" maxlength="3000" placeholder="What happened? Anything Head Office should know?"></textarea>
+<p id="nhTalkOutcomeError" class="nh-talk-outcome-error hidden" role="alert"></p>
+<div class="nh-talk-outcome-actions"><button id="nhTalkOutcomeCancel" type="button" class="secondary">Cancel</button><button id="nhTalkOutcomeSubmit" type="submit" class="nh-talk-outcome-primary">Submit Feedback</button></div>
+</form>
+</section>
+</div>
 <script type="module">
 import{LOGIN_ENDPOINT,signInNestHub,readNestHubSession,clearNestHubSession}from'./nh_auth.js';
 /*   NestHub login and mobile franchise workspace*/
@@ -455,7 +501,7 @@ try{const res=await fetch(ROSTER_ENDPOINT,{method:'POST',headers:{'Content-Type'
 catch(error){showSubmitPopup('Unable to submit',error instanceof Error?error.message:'Unable to save submission.','!',true)}
 finally{submitting=false;$('hubSubmit').disabled=!$('hubText').value.trim()}
 });
-$('signOut').addEventListener('click',()=>{contextRequest++;calendarRequest++;calendarData=null;hubOwnerId=0;talkCurrent=null;talkCanSend=false;talkConversations=[];talkMessageSeq++;talkLoadSeq++;talkActionSeq++;talkActionRequests=[];talkActionLoading=false;talkActionError='';$('messagesPage').querySelector('.nh-talk-grid').classList.remove('has-active');clearNestHubSession();resetHubHeader();showLogin()});
+$('signOut').addEventListener('click',()=>{contextRequest++;calendarRequest++;calendarData=null;hubOwnerId=0;talkCurrent=null;talkCanSend=false;talkConversations=[];talkMessageSeq++;talkLoadSeq++;talkActionSeq++;talkActionRequests=[];talkActionLoading=false;talkActionError='';talkActionUserId=0;talkCloseOutcome(true);$('messagesPage').querySelector('.nh-talk-grid').classList.remove('has-active');clearNestHubSession();resetHubHeader();showLogin()});
 
 /*   NestHub messaging — franchise oversight and participant replies*/
 const TALK_API='https://x58r-xped-p4y6.n7e.xano.io/api:o_oYSIFY/';
@@ -521,7 +567,7 @@ trials:{title:'Free Trials & Visits',description:'Scheduled visits and trials aw
 requests:{title:'Other Requests',description:'Other requests sent to your playschool.'},
 completed:{title:'Completed',description:'Requests already answered by your playschool.'}
 };
-let talkActionRequests=[],talkActionLoading=false,talkActionError='',talkActionSeq=0;
+let talkActionRequests=[],talkActionLoading=false,talkActionError='',talkActionSeq=0,talkActionUserId=0,talkOutcomeId=null,talkOutcomeSaving=false;
 const talkActiveStatuses=new Set(['scheduled','awaiting_feedback']);
 function talkActionIsTrial(row){return /^(free_trial|visit)(_|$)/.test(String(row.request_type||''))}
 function talkActionStatusLabel(status){return ({scheduled:'Scheduled',awaiting_feedback:'Feedback needed',submitted:'Response submitted',completed:'Completed',cancelled:'Cancelled'})[status]||status||'Unknown'}
@@ -570,14 +616,27 @@ const fields=[
 ['Response due',talkActionDate(row.due_at)]
 ];
 for(const [label,value] of fields){if(value===null||value===undefined||String(value).trim()==='')continue;const line=talkEl('div','nh-talk-action-detail','');line.append(talkEl('span','',label),talkEl('strong','',value));card.append(line)}
-card.append(talkEl('p','nh-talk-action-description',status==='scheduled'?'Booking received. Awaiting the scheduled appointment.':status==='awaiting_feedback'?'Franchise feedback is needed. The response form will be connected next.':status==='submitted'?'The response has been sent for Head Office processing.':status==='completed'?'Head Office has processed this response.':status==='cancelled'?'This request was cancelled.':''));
+card.append(talkEl('p','nh-talk-action-description',status==='scheduled'?'Booking received. The assigned Main account can report an outcome after the appointment begins.':status==='awaiting_feedback'?'Franchise feedback is needed.':status==='submitted'?'The response has been sent for Head Office processing.':status==='completed'?'Head Office has processed this response.':status==='cancelled'?'This request was cancelled.':''));
 if(status==='submitted'||status==='completed'){
 if(row.response_outcome)card.append(talkEl('div','nh-talk-action-outcome','Outcome: '+String(row.response_outcome)));
 if(row.response_notes)card.append(talkEl('div','nh-talk-action-outcome','Notes: '+String(row.response_notes)));
 }
 const footer=talkEl('div','nh-talk-action-card-footer','');
 footer.append(talkEl('span','',String(row.source_app||'Head Office').replace(/_/g,' ')+' · Request #'+row.id));
-if(talkActiveStatuses.has(status))footer.append(talkEl('span','',status==='scheduled'?'Outcome form coming next':'Response form coming next'));
+if(talkActiveStatuses.has(status)){
+const recipient=Number(row.recipient_user_id)||0;
+const isAssigned=recipient>0&&recipient===Number(talkActionUserId);
+const scheduled=Number(row.scheduled_at)||0;
+const canRespond=status==='awaiting_feedback'||(scheduled>0&&Date.now()>=scheduled);
+if(isAssigned&&canRespond&&talkActionIsTrial(row)){
+const submit=talkEl('button','nh-talk-action-submit','Submit outcome');submit.type='button';
+submit.addEventListener('click',()=>talkOpenOutcome(row));
+footer.append(submit);
+}else{
+const reason=!isAssigned?'Main account oversight — only the assigned account can respond':!canRespond?'Available after the scheduled appointment':'View only';
+footer.append(talkEl('span','nh-talk-action-wait',reason));
+}
+}
 card.append(footer);list.append(card);
 }
 }
@@ -590,6 +649,8 @@ const response=await talkRequest('comm_franchise_action_request_list');
 if(seq!==talkActionSeq)return;
 talkActionRequests=talkList(response,['action_requests','requests','items','results']);
 talkActionRequests.sort((a,b)=>Number(b.scheduled_at||b.created_at||0)-Number(a.scheduled_at||a.created_at||0));
+try{talkActionUserId=Number(await talkResolveOwnerId())||0}catch(_){talkActionUserId=Number(readNestHubSession()?.user?.id)||0}
+if(seq!==talkActionSeq)return;
 }catch(error){if(seq!==talkActionSeq)return;talkActionError=error?.message||'Connection unavailable';talkActionRequests=[]}
 finally{
 if(seq===talkActionSeq){
@@ -704,6 +765,67 @@ if(row)await talkSelect(row);
 await loadHubMessages();
 }catch(error){$('nhTalkStatus').textContent=error.message;$('nhTalkStatus').classList.add('error')}
 finally{talkSending=false;talkComposer()}
+});
+
+/*   NestHub action responses — assigned Main account*/
+function talkOpenOutcome(row){
+if(talkOutcomeSaving)return;
+if(!talkActiveStatuses.has(String(row.status||'')))return;
+if(Number(row.recipient_user_id)!==Number(talkActionUserId)||!talkActionUserId)return;
+if(row.status==='scheduled'&&Number(row.scheduled_at)>Date.now())return;
+if(!talkActionIsTrial(row))return;
+talkOutcomeId=Number(row.id);
+const data=row.request_data&&typeof row.request_data==='object'?row.request_data:{};
+$('nhTalkOutcomeTitle').textContent=/visit/.test(String(row.request_type))?'Submit visit outcome':'Submit free-trial outcome';
+const label=String(data.child_name||data.student_name||row.title||'Appointment');
+$('nhTalkOutcomeDetails').textContent=label+(Number(row.scheduled_at)>0?' · '+talkActionDate(row.scheduled_at):'');
+$('nhTalkOutcomeSelect').value='';
+$('nhTalkOutcomeNotes').value='';
+$('nhTalkOutcomeError').classList.add('hidden');
+$('nhTalkOutcomeError').textContent='';
+$('nhTalkOutcomeModal').classList.remove('hidden');
+$('nhTalkOutcomeSelect').focus();
+}
+function talkCloseOutcome(force=false){
+if(talkOutcomeSaving&&!force)return;
+talkOutcomeId=null;
+$('nhTalkOutcomeModal').classList.add('hidden');
+}
+$('nhTalkOutcomeCancel').addEventListener('click',()=>talkCloseOutcome());
+$('nhTalkOutcomeClose').addEventListener('click',()=>talkCloseOutcome());
+$('nhTalkOutcomeModal').addEventListener('click',event=>{if(event.target===$('nhTalkOutcomeModal'))talkCloseOutcome()});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('nhTalkOutcomeModal').classList.contains('hidden'))talkCloseOutcome()});
+$('nhTalkOutcomeForm').addEventListener('submit',async event=>{
+event.preventDefault();
+if(talkOutcomeSaving||!talkOutcomeId)return;
+const outcome=$('nhTalkOutcomeSelect').value;
+if(!outcome){$('nhTalkOutcomeSelect').focus();return}
+const row=talkActionRequests.find(item=>Number(item.id)===talkOutcomeId);
+if(!row||Number(row.recipient_user_id)!==Number(talkActionUserId)||!talkActionUserId)return;
+const id=talkOutcomeId;
+talkOutcomeSaving=true;
+$('nhTalkOutcomeSubmit').disabled=true;
+$('nhTalkOutcomeCancel').disabled=true;
+$('nhTalkOutcomeClose').disabled=true;
+$('nhTalkOutcomeSubmit').textContent='Submitting…';
+$('nhTalkOutcomeError').classList.add('hidden');
+try{
+const result=await talkRequest('comm_franchise_action_request_respond',{action_request_id:id,response_outcome:outcome,response_notes:$('nhTalkOutcomeNotes').value.trim(),response_data:{}},'POST');
+const updated=result.action_request||result.data?.action_request||{};
+if(Number(updated.id)!==id||String(updated.status)!=='submitted'||Number(updated.responded_at)<=0)throw new Error('Submission was not confirmed. Refresh the request status before resubmitting.');
+talkOutcomeSaving=false;talkCloseOutcome(true);
+talkSetFolder('completed');
+await loadHubActionRequests();
+}catch(error){
+$('nhTalkOutcomeError').textContent=error?.message||'Could not submit feedback. Check the request status before trying again.';
+$('nhTalkOutcomeError').classList.remove('hidden');
+}finally{
+talkOutcomeSaving=false;
+$('nhTalkOutcomeSubmit').disabled=false;
+$('nhTalkOutcomeCancel').disabled=false;
+$('nhTalkOutcomeClose').disabled=false;
+$('nhTalkOutcomeSubmit').textContent='Submit Feedback';
+}
 });
 
 talkSetFolder('conversations');
